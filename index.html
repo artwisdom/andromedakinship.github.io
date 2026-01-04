@@ -585,8 +585,9 @@
 
             .uap-alert {
                 bottom: auto;
-                top: 130px;
-                right: 15px;
+                top: 160px;
+                left: 15px;
+                right: auto;
                 font-size: 0.6rem;
                 padding: 6px 12px;
             }
@@ -990,6 +991,331 @@
             document.body.appendChild(text);
             
             setTimeout(() => text.remove(), 1000);
+        }
+
+        // Plasma explosion for UAP destruction
+        const plasmaParticles = [];
+        
+        function createPlasmaExplosion(x, y) {
+            const particleCount = 150;
+            const colors = ['#00ffff', '#ff00ff', '#00ff00', '#ffff00', '#ff0080', '#8000ff', '#00ff80'];
+            
+            for (let i = 0; i < particleCount; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 12 + 3;
+                plasmaParticles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    radius: Math.random() * 8 + 2,
+                    life: 1,
+                    decay: Math.random() * 0.008 + 0.005,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    pulse: Math.random() * Math.PI * 2
+                });
+            }
+            
+            // Add electric arcs
+            for (let i = 0; i < 30; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * 50 + 20;
+                plasmaParticles.push({
+                    x: x + Math.cos(angle) * dist,
+                    y: y + Math.sin(angle) * dist,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8,
+                    radius: Math.random() * 3 + 1,
+                    life: 1,
+                    decay: Math.random() * 0.02 + 0.01,
+                    color: '#ffffff',
+                    isArc: true,
+                    arcTarget: { x: x, y: y }
+                });
+            }
+        }
+
+        function drawPlasmaParticles(time) {
+            for (let i = plasmaParticles.length - 1; i >= 0; i--) {
+                const p = plasmaParticles[i];
+                
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vx *= 0.98;
+                p.vy *= 0.98;
+                p.life -= p.decay;
+                p.pulse = (p.pulse || 0) + 0.2;
+                
+                if (p.life <= 0) {
+                    plasmaParticles.splice(i, 1);
+                    continue;
+                }
+                
+                const x = (p.x - camera.x) * camera.zoom + canvas.width / 2;
+                const y = (p.y - camera.y) * camera.zoom + canvas.height / 2;
+                const pulseSize = 1 + Math.sin(p.pulse) * 0.3;
+                const radius = p.radius * camera.zoom * p.life * pulseSize;
+                
+                // Glow effect
+                const glow = ctx.createRadialGradient(x, y, 0, x, y, radius * 3);
+                glow.addColorStop(0, p.color + 'cc');
+                glow.addColorStop(0.5, p.color + '44');
+                glow.addColorStop(1, 'transparent');
+                
+                ctx.beginPath();
+                ctx.arc(x, y, radius * 3, 0, Math.PI * 2);
+                ctx.fillStyle = glow;
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            }
+        }
+
+        // Alien invasion
+        let earthDestroyed = false;
+        let invasionActive = false;
+        const alienShips = [];
+        const earthDebris = [];
+
+        function triggerAlienInvasion() {
+            if (invasionActive || earthDestroyed) return;
+            invasionActive = true;
+            
+            // Find Earth
+            const earth = planets.find(p => p.name === 'Earth');
+            if (!earth) return;
+            
+            const earthX = sun.x + Math.cos(earth.angle) * earth.distance;
+            const earthY = sun.y + Math.sin(earth.angle) * earth.distance;
+            
+            // Spawn alien ships from multiple directions
+            for (let i = 0; i < 8; i++) {
+                const spawnAngle = (Math.PI * 2 / 8) * i;
+                const spawnDist = 300;
+                alienShips.push({
+                    x: earthX + Math.cos(spawnAngle) * spawnDist,
+                    y: earthY + Math.sin(spawnAngle) * spawnDist,
+                    targetX: earthX,
+                    targetY: earthY,
+                    angle: spawnAngle + Math.PI,
+                    phase: Math.random() * Math.PI * 2,
+                    charging: false,
+                    chargeTime: 0,
+                    fired: false
+                });
+            }
+        }
+
+        function updateAlienInvasion(time) {
+            if (!invasionActive) return;
+            
+            const earth = planets.find(p => p.name === 'Earth');
+            if (!earth || earthDestroyed) {
+                // Clean up ships after destruction
+                if (alienShips.length > 0 && earthDestroyed) {
+                    for (let i = alienShips.length - 1; i >= 0; i--) {
+                        const ship = alienShips[i];
+                        ship.x += Math.cos(ship.angle) * 2;
+                        ship.y += Math.sin(ship.angle) * 2;
+                        // Remove ships that have flown away
+                        const dist = Math.sqrt(ship.x * ship.x + ship.y * ship.y);
+                        if (dist > 1500) {
+                            alienShips.splice(i, 1);
+                        }
+                    }
+                }
+                return;
+            }
+            
+            const earthX = sun.x + Math.cos(earth.angle) * earth.distance;
+            const earthY = sun.y + Math.sin(earth.angle) * earth.distance;
+            
+            let allFired = true;
+            
+            for (const ship of alienShips) {
+                // Move towards Earth
+                const dx = earthX - ship.x;
+                const dy = earthY - ship.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist > 80 && !ship.charging) {
+                    ship.x += (dx / dist) * 3;
+                    ship.y += (dy / dist) * 3;
+                    ship.angle = Math.atan2(dy, dx);
+                    allFired = false;
+                } else if (!ship.fired) {
+                    ship.charging = true;
+                    ship.chargeTime++;
+                    allFired = false;
+                    
+                    // Fire after charging
+                    if (ship.chargeTime > 60) {
+                        ship.fired = true;
+                    }
+                }
+                
+                ship.phase += 0.1;
+            }
+            
+            // Check if all ships have fired
+            if (allFired && alienShips.length > 0) {
+                destroyEarth(earth, earthX, earthY);
+            }
+        }
+
+        function destroyEarth(earth, earthX, earthY) {
+            earthDestroyed = true;
+            
+            // Create massive debris field
+            const debrisCount = 200;
+            for (let i = 0; i < debrisCount; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 4 + 1;
+                const isLand = Math.random() > 0.6;
+                earthDebris.push({
+                    x: earthX + (Math.random() - 0.5) * earth.radius * 2,
+                    y: earthY + (Math.random() - 0.5) * earth.radius * 2,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    radius: Math.random() * 6 + 2,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.1,
+                    color: isLand ? '#22c55e' : '#3b82f6',
+                    life: 1
+                });
+            }
+            
+            // Destroy moon too
+            if (earth.moons && earth.moons.length > 0) {
+                const moon = earth.moons[0];
+                const moonX = earthX + Math.cos(moon.angle) * moon.distance;
+                const moonY = earthY + Math.sin(moon.angle) * moon.distance;
+                
+                for (let i = 0; i < 50; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 3 + 0.5;
+                    earthDebris.push({
+                        x: moonX + (Math.random() - 0.5) * moon.radius * 2,
+                        y: moonY + (Math.random() - 0.5) * moon.radius * 2,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        radius: Math.random() * 4 + 1,
+                        rotation: Math.random() * Math.PI * 2,
+                        rotationSpeed: (Math.random() - 0.5) * 0.1,
+                        color: '#d1d5db',
+                        life: 1
+                    });
+                }
+                earth.moons = [];
+            }
+            
+            // Create shockwave
+            createPlasmaExplosion(earthX, earthY);
+            createPlasmaExplosion(earthX, earthY);
+            createPlasmaExplosion(earthX, earthY);
+            
+            // Remove Earth from planets array
+            const earthIndex = planets.findIndex(p => p.name === 'Earth');
+            if (earthIndex > -1) {
+                planets.splice(earthIndex, 1);
+            }
+            
+            // Ships fly away
+            for (const ship of alienShips) {
+                ship.angle = Math.atan2(ship.y - earthY, ship.x - earthX);
+            }
+        }
+
+        function drawAlienShips(time) {
+            for (const ship of alienShips) {
+                const x = (ship.x - camera.x) * camera.zoom + canvas.width / 2;
+                const y = (ship.y - camera.y) * camera.zoom + canvas.height / 2;
+                const size = 15 * camera.zoom;
+                
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(ship.angle);
+                
+                // Ship glow
+                const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 3);
+                glow.addColorStop(0, 'rgba(255, 0, 0, 0.3)');
+                glow.addColorStop(1, 'transparent');
+                ctx.beginPath();
+                ctx.arc(0, 0, size * 3, 0, Math.PI * 2);
+                ctx.fillStyle = glow;
+                ctx.fill();
+                
+                // Ship body - menacing triangle
+                ctx.beginPath();
+                ctx.moveTo(size * 1.5, 0);
+                ctx.lineTo(-size, -size * 0.8);
+                ctx.lineTo(-size * 0.5, 0);
+                ctx.lineTo(-size, size * 0.8);
+                ctx.closePath();
+                ctx.fillStyle = '#1a1a2e';
+                ctx.fill();
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = 2 * camera.zoom;
+                ctx.stroke();
+                
+                // Pulsing red light
+                const pulse = Math.sin(ship.phase) * 0.5 + 0.5;
+                ctx.beginPath();
+                ctx.arc(0, 0, size * 0.3, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 0, 0, ${0.5 + pulse * 0.5})`;
+                ctx.fill();
+                
+                // Charging beam
+                if (ship.charging && !ship.fired) {
+                    const chargeProgress = ship.chargeTime / 60;
+                    const beamGlow = ctx.createRadialGradient(size * 1.5, 0, 0, size * 1.5, 0, size * 2 * chargeProgress);
+                    beamGlow.addColorStop(0, `rgba(255, 50, 50, ${chargeProgress})`);
+                    beamGlow.addColorStop(1, 'transparent');
+                    ctx.beginPath();
+                    ctx.arc(size * 1.5, 0, size * 2 * chargeProgress, 0, Math.PI * 2);
+                    ctx.fillStyle = beamGlow;
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            }
+        }
+
+        function drawEarthDebris() {
+            for (let i = earthDebris.length - 1; i >= 0; i--) {
+                const d = earthDebris[i];
+                
+                d.x += d.vx;
+                d.y += d.vy;
+                d.vx *= 0.999;
+                d.vy *= 0.999;
+                d.rotation += d.rotationSpeed;
+                
+                const x = (d.x - camera.x) * camera.zoom + canvas.width / 2;
+                const y = (d.y - camera.y) * camera.zoom + canvas.height / 2;
+                const radius = d.radius * camera.zoom;
+                
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(d.rotation);
+                
+                // Irregular debris shape
+                ctx.beginPath();
+                ctx.moveTo(radius, 0);
+                ctx.lineTo(radius * 0.3, radius * 0.8);
+                ctx.lineTo(-radius * 0.7, radius * 0.5);
+                ctx.lineTo(-radius, -radius * 0.3);
+                ctx.lineTo(-radius * 0.2, -radius * 0.9);
+                ctx.lineTo(radius * 0.6, -radius * 0.4);
+                ctx.closePath();
+                ctx.fillStyle = d.color;
+                ctx.fill();
+                
+                ctx.restore();
+            }
         }
 
         // Comets - Spectacular slow-moving comets
@@ -1870,13 +2196,33 @@
             camera.targetZoom = Math.max(0.3, Math.min(3, camera.targetZoom * zoomFactor));
         });
 
-        // Click detection for asteroids
+        // Click detection for asteroids and UAPs
         canvas.addEventListener('click', (e) => {
             if (camera.isDragging) return;
             
             const clickX = (e.clientX - canvas.width / 2) / camera.zoom + camera.x;
             const clickY = (e.clientY - canvas.height / 2) / camera.zoom + camera.y;
             
+            // Check UAPs first (easter egg)
+            for (let i = uaps.length - 1; i >= 0; i--) {
+                const uap = uaps[i];
+                const dx = clickX - uap.x;
+                const dy = clickY - uap.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < uap.radius * 3 + 15) {
+                    // Epic plasma explosion
+                    createPlasmaExplosion(uap.x, uap.y);
+                    uaps.splice(i, 1);
+                    // Trigger invasion after delay
+                    setTimeout(() => {
+                        triggerAlienInvasion();
+                    }, 15000 + Math.random() * 5000);
+                    return;
+                }
+            }
+            
+            // Check asteroids
             for (const asteroid of asteroids) {
                 if (!asteroid.alive) continue;
                 
@@ -1894,9 +2240,13 @@
             }
         });
 
-        // Touch support with pinch-to-zoom
+        // Touch support with pinch-to-zoom and tap-to-destroy
         let initialPinchDistance = null;
         let initialZoom = null;
+        let touchStartX = null;
+        let touchStartY = null;
+        let touchStartTime = null;
+        let hasMoved = false;
 
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
@@ -1908,11 +2258,15 @@
                 initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
                 initialZoom = camera.targetZoom;
             } else if (e.touches.length === 1) {
-                // Single finger pan
+                // Single finger - track for tap vs drag
                 const touch = e.touches[0];
                 camera.isDragging = true;
                 camera.lastX = touch.clientX;
                 camera.lastY = touch.clientY;
+                touchStartX = touch.clientX;
+                touchStartY = touch.clientY;
+                touchStartTime = Date.now();
+                hasMoved = false;
             }
         });
 
@@ -1932,6 +2286,14 @@
                 const touch = e.touches[0];
                 const dx = touch.clientX - camera.lastX;
                 const dy = touch.clientY - camera.lastY;
+                
+                // Check if moved significantly
+                const totalDx = touch.clientX - touchStartX;
+                const totalDy = touch.clientY - touchStartY;
+                if (Math.abs(totalDx) > 10 || Math.abs(totalDy) > 10) {
+                    hasMoved = true;
+                }
+                
                 camera.x -= dx / camera.zoom;
                 camera.y -= dy / camera.zoom;
                 camera.lastX = touch.clientX;
@@ -1940,12 +2302,63 @@
         });
 
         canvas.addEventListener('touchend', (e) => {
+            // Check for tap (short duration, didn't move much)
+            if (touchStartX !== null && !hasMoved) {
+                const touchDuration = Date.now() - touchStartTime;
+                
+                if (touchDuration < 300) {
+                    // This was a tap - check for UAP hit first (easter egg)
+                    const tapX = (touchStartX - canvas.width / 2) / camera.zoom + camera.x;
+                    const tapY = (touchStartY - canvas.height / 2) / camera.zoom + camera.y;
+                    
+                    let hitUAP = false;
+                    for (let i = uaps.length - 1; i >= 0; i--) {
+                        const uap = uaps[i];
+                        const dx = tapX - uap.x;
+                        const dy = tapY - uap.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (dist < uap.radius * 3 + 25) {
+                            createPlasmaExplosion(uap.x, uap.y);
+                            uaps.splice(i, 1);
+                            setTimeout(() => {
+                                triggerAlienInvasion();
+                            }, 15000 + Math.random() * 5000);
+                            hitUAP = true;
+                            break;
+                        }
+                    }
+                    
+                    // Check for asteroid hit if no UAP was hit
+                    if (!hitUAP) {
+                        for (const asteroid of asteroids) {
+                            if (!asteroid.alive) continue;
+                            
+                            const dx = tapX - asteroid.x;
+                            const dy = tapY - asteroid.y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            
+                            if (dist < asteroid.radius + 20) {
+                                asteroid.alive = false;
+                                createExplosion(asteroid.x, asteroid.y);
+                                asteroidCount++;
+                                document.getElementById('asteroidCount').textContent = asteroidCount;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
             if (e.touches.length < 2) {
                 initialPinchDistance = null;
                 initialZoom = null;
             }
             if (e.touches.length === 0) {
                 camera.isDragging = false;
+                touchStartX = null;
+                touchStartY = null;
+                hasMoved = false;
             }
         });
 
@@ -1983,6 +2396,14 @@
             
             // Draw explosions
             drawExplosions();
+            
+            // Draw plasma particles (UAP destruction)
+            drawPlasmaParticles(time);
+            
+            // Update and draw alien invasion
+            updateAlienInvasion(time);
+            drawAlienShips(time);
+            drawEarthDebris();
             
             // Spawn and draw comets
             maybeSpawnComet();
