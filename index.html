@@ -422,18 +422,21 @@
         /* UAP Alert */
         .uap-alert {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 150;
+            bottom: 100px;
+            right: 30px;
+            z-index: 5;
             font-family: 'Orbitron', monospace;
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: 5px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 2px;
             color: #00ff00;
-            text-shadow: 0 0 30px #00ff00, 0 0 60px #00ff00;
+            text-shadow: 0 0 10px #00ff00;
             opacity: 0;
             pointer-events: none;
+            padding: 8px 16px;
+            border: 1px solid rgba(0, 255, 0, 0.4);
+            background: rgba(0, 30, 0, 0.6);
+            border-radius: 5px;
         }
 
         .uap-alert.active {
@@ -441,12 +444,13 @@
         }
 
         @keyframes uapAlert {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-            10% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-            20% { transform: translate(-50%, -50%) scale(1); }
-            80% { opacity: 1; }
+            0% { opacity: 0; }
+            10% { opacity: 0.7; }
+            80% { opacity: 0.7; }
             100% { opacity: 0; }
         }
+
+        /* Comet - no alert needed */
 
         /* Responsive */
         @media (max-width: 768px) {
@@ -596,7 +600,7 @@
     </aside>
 
     <!-- UAP Alert -->
-    <div class="uap-alert" id="uapAlert">⚠ UAP DETECTED ⚠</div>
+    <div class="uap-alert" id="uapAlert">UAP DETECTED</div>
 
     <script>
         // ============================================
@@ -685,15 +689,127 @@
             name: 'SUN'
         };
 
+        // Detailed planet data with moons
         const planets = [
-            { name: 'Mercury', distance: 150, radius: 8, color: '#9ca3af', speed: 0.008, angle: Math.random() * Math.PI * 2, info: 'Smallest planet' },
-            { name: 'Venus', distance: 200, radius: 12, color: '#f59e0b', speed: 0.006, angle: Math.random() * Math.PI * 2, info: 'Hottest planet' },
-            { name: 'Earth', distance: 270, radius: 14, color: '#3b82f6', speed: 0.005, angle: Math.random() * Math.PI * 2, info: 'Our home', hasMoon: true },
-            { name: 'Mars', distance: 350, radius: 10, color: '#ef4444', speed: 0.004, angle: Math.random() * Math.PI * 2, info: 'The red planet' },
-            { name: 'Jupiter', distance: 480, radius: 35, color: '#d97706', speed: 0.002, angle: Math.random() * Math.PI * 2, info: 'Largest planet', hasStripes: true },
-            { name: 'Saturn', distance: 620, radius: 30, color: '#eab308', speed: 0.0015, angle: Math.random() * Math.PI * 2, info: 'Ring giant', hasRings: true },
-            { name: 'Uranus', distance: 750, radius: 20, color: '#67e8f9', speed: 0.001, angle: Math.random() * Math.PI * 2, info: 'Ice giant' },
-            { name: 'Neptune', distance: 880, radius: 19, color: '#3b82f6', speed: 0.0008, angle: Math.random() * Math.PI * 2, info: 'Windiest planet' }
+            { 
+                name: 'Mercury', 
+                distance: 150, 
+                radius: 8, 
+                color: '#9ca3af', 
+                speed: 0.008, 
+                angle: Math.random() * Math.PI * 2,
+                rotation: 0,
+                rotationSpeed: 0.01,
+                moons: [],
+                craters: true
+            },
+            { 
+                name: 'Venus', 
+                distance: 200, 
+                radius: 12, 
+                color: '#f59e0b', 
+                speed: 0.006, 
+                angle: Math.random() * Math.PI * 2,
+                rotation: 0,
+                rotationSpeed: -0.005, // Retrograde rotation
+                moons: [],
+                atmosphere: '#fcd34d'
+            },
+            { 
+                name: 'Earth', 
+                distance: 270, 
+                radius: 14, 
+                color: '#3b82f6', 
+                speed: 0.005, 
+                angle: Math.random() * Math.PI * 2,
+                rotation: 0,
+                rotationSpeed: 0.02,
+                moons: [
+                    { name: 'Moon', distance: 25, radius: 4, color: '#d1d5db', speed: 0.03, angle: 0 }
+                ],
+                hasLand: true,
+                hasClouds: true
+            },
+            { 
+                name: 'Mars', 
+                distance: 350, 
+                radius: 10, 
+                color: '#ef4444', 
+                speed: 0.004, 
+                angle: Math.random() * Math.PI * 2,
+                rotation: 0,
+                rotationSpeed: 0.019,
+                moons: [
+                    { name: 'Phobos', distance: 18, radius: 2, color: '#9ca3af', speed: 0.05, angle: 0 },
+                    { name: 'Deimos', distance: 25, radius: 1.5, color: '#a1a1aa', speed: 0.03, angle: Math.PI }
+                ],
+                hasPolarCaps: true
+            },
+            { 
+                name: 'Jupiter', 
+                distance: 480, 
+                radius: 35, 
+                color: '#d97706', 
+                speed: 0.002, 
+                angle: Math.random() * Math.PI * 2,
+                rotation: 0,
+                rotationSpeed: 0.04, // Fast rotation
+                moons: [
+                    { name: 'Io', distance: 55, radius: 4, color: '#fbbf24', speed: 0.025, angle: 0 },
+                    { name: 'Europa', distance: 65, radius: 3.5, color: '#e0e7ff', speed: 0.02, angle: Math.PI/2 },
+                    { name: 'Ganymede', distance: 78, radius: 5, color: '#9ca3af', speed: 0.015, angle: Math.PI },
+                    { name: 'Callisto', distance: 92, radius: 4.5, color: '#6b7280', speed: 0.01, angle: Math.PI*1.5 }
+                ],
+                hasGreatRedSpot: true,
+                hasStripes: true
+            },
+            { 
+                name: 'Saturn', 
+                distance: 620, 
+                radius: 30, 
+                color: '#eab308', 
+                speed: 0.0015, 
+                angle: Math.random() * Math.PI * 2,
+                rotation: 0,
+                rotationSpeed: 0.038,
+                moons: [
+                    { name: 'Titan', distance: 55, radius: 5, color: '#f59e0b', speed: 0.012, angle: 0 },
+                    { name: 'Rhea', distance: 45, radius: 2.5, color: '#e5e7eb', speed: 0.02, angle: Math.PI/3 },
+                    { name: 'Enceladus', distance: 38, radius: 2, color: '#ffffff', speed: 0.03, angle: Math.PI }
+                ],
+                hasRings: true
+            },
+            { 
+                name: 'Uranus', 
+                distance: 750, 
+                radius: 20, 
+                color: '#67e8f9', 
+                speed: 0.001, 
+                angle: Math.random() * Math.PI * 2,
+                rotation: 0,
+                rotationSpeed: -0.025, // Retrograde
+                moons: [
+                    { name: 'Miranda', distance: 32, radius: 2, color: '#d1d5db', speed: 0.025, angle: 0 },
+                    { name: 'Ariel', distance: 38, radius: 2.5, color: '#e5e7eb', speed: 0.02, angle: Math.PI/2 },
+                    { name: 'Titania', distance: 48, radius: 3, color: '#9ca3af', speed: 0.015, angle: Math.PI }
+                ],
+                tilt: Math.PI * 0.45, // Uranus is tilted
+                hasSubtleRings: true
+            },
+            { 
+                name: 'Neptune', 
+                distance: 880, 
+                radius: 19, 
+                color: '#3b82f6', 
+                speed: 0.0008, 
+                angle: Math.random() * Math.PI * 2,
+                rotation: 0,
+                rotationSpeed: 0.028,
+                moons: [
+                    { name: 'Triton', distance: 35, radius: 3.5, color: '#fecaca', speed: -0.02, angle: 0 } // Retrograde orbit
+                ],
+                hasGreatDarkSpot: true
+            }
         ];
 
         // Asteroid Belt
@@ -757,81 +873,97 @@
             setTimeout(() => text.remove(), 1000);
         }
 
-        // Comets
+        // Comets - Spectacular slow-moving comets
         const comets = [];
-        let lastCometTime = 0;
+        let cometGuaranteed = false;
+
+        function spawnSpectacularComet() {
+            // Start from edge of solar system
+            const startAngle = Math.random() * Math.PI * 2;
+            const startDistance = 1200;
+            const startX = Math.cos(startAngle) * startDistance;
+            const startY = Math.sin(startAngle) * startDistance;
+            
+            // Aim towards inner solar system (near sun but not directly at it)
+            const targetAngle = startAngle + Math.PI + (Math.random() - 0.5) * 0.5;
+            const targetDistance = 100 + Math.random() * 200;
+            const targetX = Math.cos(targetAngle) * targetDistance;
+            const targetY = Math.sin(targetAngle) * targetDistance;
+            
+            const dx = targetX - startX;
+            const dy = targetY - startY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            // Very slow speed for dramatic effect
+            const speed = 0.8;
+            
+            comets.push({
+                x: startX,
+                y: startY,
+                vx: (dx / dist) * speed,
+                vy: (dy / dist) * speed,
+                radius: 12,
+                tail: [],
+                tailLength: 1000, // Very long beautiful tail
+                coreGlow: 0,
+                counted: false,
+                age: 0
+            });
+            // No alert - let it be a surprise discovery
+        }
 
         function maybeSpawnComet() {
-            const now = Date.now();
-            if (now - lastCometTime > 15000 && Math.random() < 0.01) {
-                lastCometTime = now;
-                const side = Math.floor(Math.random() * 4);
-                let x, y, vx, vy;
-                
-                const speed = 3 + Math.random() * 2;
-                
-                switch(side) {
-                    case 0: // top
-                        x = camera.x + (Math.random() - 0.5) * canvas.width / camera.zoom;
-                        y = camera.y - canvas.height / camera.zoom;
-                        vx = (Math.random() - 0.5) * speed;
-                        vy = speed;
-                        break;
-                    case 1: // right
-                        x = camera.x + canvas.width / camera.zoom;
-                        y = camera.y + (Math.random() - 0.5) * canvas.height / camera.zoom;
-                        vx = -speed;
-                        vy = (Math.random() - 0.5) * speed;
-                        break;
-                    case 2: // bottom
-                        x = camera.x + (Math.random() - 0.5) * canvas.width / camera.zoom;
-                        y = camera.y + canvas.height / camera.zoom;
-                        vx = (Math.random() - 0.5) * speed;
-                        vy = -speed;
-                        break;
-                    case 3: // left
-                        x = camera.x - canvas.width / camera.zoom;
-                        y = camera.y + (Math.random() - 0.5) * canvas.height / camera.zoom;
-                        vx = speed;
-                        vy = (Math.random() - 0.5) * speed;
-                        break;
-                }
-                
-                comets.push({
-                    x, y, vx, vy,
-                    radius: 8 + Math.random() * 5,
-                    tail: [],
-                    tailLength: 30,
-                    counted: false
-                });
+            // Guarantee a comet by the time UAP count hits 12
+            if (!cometGuaranteed && uapCount >= 10 && comets.length === 0) {
+                cometGuaranteed = true;
+                spawnSpectacularComet();
+                return;
+            }
+            
+            // After first comet, very rare random spawns
+            if (cometCount > 0 && comets.length === 0 && Math.random() < 0.0002) {
+                spawnSpectacularComet();
             }
         }
 
-        // UAPs
+        // UAPs - Tic-tac style with sharp angular movements
         const uaps = [];
         let lastUAPTime = 0;
 
         function maybeSpawnUAP() {
             const now = Date.now();
-            if (now - lastUAPTime > 30000 && Math.random() < 0.005) {
+            // Spawn UAPs less frequently
+            if (now - lastUAPTime > 20000 && Math.random() < 0.015) {
                 lastUAPTime = now;
                 
-                const startX = camera.x + (Math.random() - 0.5) * canvas.width * 2 / camera.zoom;
-                const startY = camera.y + (Math.random() - 0.5) * canvas.height * 2 / camera.zoom;
+                // Spawn in visible area
+                const spawnDist = 350;
+                const spawnAngle = Math.random() * Math.PI * 2;
+                const startX = camera.x + Math.cos(spawnAngle) * spawnDist;
+                const startY = camera.y + Math.sin(spawnAngle) * spawnDist;
+                
+                // Move across the visible area
+                const targetAngle = spawnAngle + Math.PI + (Math.random() - 0.5) * 1;
+                const targetDist = 500;
                 
                 uaps.push({
                     x: startX,
                     y: startY,
-                    targetX: startX + (Math.random() - 0.5) * 1000,
-                    targetY: startY + (Math.random() - 0.5) * 1000,
-                    radius: 15,
+                    targetX: camera.x + Math.cos(targetAngle) * targetDist,
+                    targetY: camera.y + Math.sin(targetAngle) * targetDist,
+                    radius: 8, // Smaller tic-tac size
                     phase: 0,
-                    life: 5,
-                    zigzagTimer: 0,
-                    counted: false
+                    life: 6,
+                    moveTimer: 0,
+                    currentVx: 0,
+                    currentVy: 0,
+                    nextTurnTime: Math.random() * 30 + 20,
+                    counted: false,
+                    trail: [],
+                    pulsePhase: 0
                 });
 
-                // Show alert
+                // Show subtle alert
                 const alert = document.getElementById('uapAlert');
                 alert.classList.add('active');
                 setTimeout(() => alert.classList.remove('active'), 3000);
@@ -943,11 +1075,30 @@
                 ctx.arc(spotX, spotY, radius * 0.15, 0, Math.PI * 2);
                 ctx.fill();
             }
+            
+            // Solar flares
+            for (let i = 0; i < 8; i++) {
+                const flareAngle = time * 0.001 + i * Math.PI / 4;
+                const flareLength = radius * (0.3 + Math.sin(time * 0.003 + i) * 0.15);
+                const flareX = x + Math.cos(flareAngle) * (radius + flareLength * 0.5);
+                const flareY = y + Math.sin(flareAngle) * (radius + flareLength * 0.5);
+                
+                const flareGradient = ctx.createRadialGradient(flareX, flareY, 0, flareX, flareY, flareLength);
+                flareGradient.addColorStop(0, 'rgba(255, 200, 50, 0.4)');
+                flareGradient.addColorStop(1, 'transparent');
+                
+                ctx.beginPath();
+                ctx.arc(flareX, flareY, flareLength, 0, Math.PI * 2);
+                ctx.fillStyle = flareGradient;
+                ctx.fill();
+            }
         }
 
         function drawPlanet(planet, time) {
-            // Update position
+            // Update position and rotation
             planet.angle += planet.speed;
+            planet.rotation += planet.rotationSpeed;
+            
             const planetX = sun.x + Math.cos(planet.angle) * planet.distance;
             const planetY = sun.y + Math.sin(planet.angle) * planet.distance;
             
@@ -964,28 +1115,32 @@
             ctx.fillStyle = glowGradient;
             ctx.fill();
             
-            // Saturn's rings
+            // Saturn's rings (behind planet)
             if (planet.hasRings) {
+                drawSaturnRings(x, y, radius, planet.rotation, true);
+            }
+            
+            // Uranus subtle rings
+            if (planet.hasSubtleRings) {
                 ctx.save();
                 ctx.translate(x, y);
-                ctx.scale(1, 0.3);
-                
-                ctx.strokeStyle = 'rgba(234, 179, 8, 0.6)';
-                ctx.lineWidth = 3 * camera.zoom;
+                ctx.rotate(planet.tilt || 0);
+                ctx.scale(1, 0.2);
+                ctx.strokeStyle = 'rgba(103, 232, 249, 0.3)';
+                ctx.lineWidth = 2 * camera.zoom;
                 ctx.beginPath();
-                ctx.arc(0, 0, radius * 1.8, 0, Math.PI * 2);
+                ctx.arc(0, 0, radius * 1.6, 0, Math.PI * 2);
                 ctx.stroke();
-                
-                ctx.strokeStyle = 'rgba(234, 179, 8, 0.4)';
-                ctx.lineWidth = 5 * camera.zoom;
-                ctx.beginPath();
-                ctx.arc(0, 0, radius * 2.2, 0, Math.PI * 2);
-                ctx.stroke();
-                
                 ctx.restore();
             }
             
             // Planet body
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.clip();
+            
+            // Base gradient
             const planetGradient = ctx.createRadialGradient(
                 x - radius * 0.3, y - radius * 0.3, 0,
                 x, y, radius
@@ -994,38 +1149,92 @@
             planetGradient.addColorStop(0.7, planet.color);
             planetGradient.addColorStop(1, darkenColor(planet.color, 30));
             
-            ctx.beginPath();
-            ctx.arc(x, y, radius, 0, Math.PI * 2);
             ctx.fillStyle = planetGradient;
-            ctx.fill();
+            ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
             
-            // Jupiter stripes
-            if (planet.hasStripes) {
-                ctx.save();
-                ctx.beginPath();
-                ctx.arc(x, y, radius, 0, Math.PI * 2);
-                ctx.clip();
-                
-                ctx.fillStyle = 'rgba(180, 100, 50, 0.3)';
-                for (let i = -3; i <= 3; i++) {
-                    ctx.fillRect(x - radius, y + i * radius * 0.25 - 2, radius * 2, 4);
-                }
-                ctx.restore();
+            // Earth's continents
+            if (planet.hasLand) {
+                drawEarthDetails(x, y, radius, planet.rotation, time);
             }
             
-            // Earth's moon
-            if (planet.hasMoon) {
-                const moonAngle = time * 0.003;
-                const moonDist = radius * 2.5;
-                const moonX = x + Math.cos(moonAngle) * moonDist;
-                const moonY = y + Math.sin(moonAngle) * moonDist;
-                const moonRadius = radius * 0.25;
-                
+            // Mercury/Moon craters
+            if (planet.craters) {
+                drawCraters(x, y, radius, planet.rotation);
+            }
+            
+            // Mars polar caps
+            if (planet.hasPolarCaps) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
                 ctx.beginPath();
-                ctx.arc(moonX, moonY, moonRadius, 0, Math.PI * 2);
-                ctx.fillStyle = '#9ca3af';
+                ctx.ellipse(x, y - radius * 0.85, radius * 0.3, radius * 0.15, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.ellipse(x, y + radius * 0.85, radius * 0.25, radius * 0.12, 0, 0, Math.PI * 2);
                 ctx.fill();
             }
+            
+            // Venus atmosphere
+            if (planet.atmosphere) {
+                const atmGradient = ctx.createRadialGradient(x, y, radius * 0.5, x, y, radius);
+                atmGradient.addColorStop(0, 'transparent');
+                atmGradient.addColorStop(0.7, 'rgba(252, 211, 77, 0.2)');
+                atmGradient.addColorStop(1, 'rgba(252, 211, 77, 0.4)');
+                ctx.fillStyle = atmGradient;
+                ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+            }
+            
+            // Jupiter stripes and Great Red Spot
+            if (planet.hasStripes) {
+                drawJupiterDetails(x, y, radius, planet.rotation, time);
+            }
+            
+            // Neptune Great Dark Spot
+            if (planet.hasGreatDarkSpot) {
+                const spotAngle = planet.rotation;
+                const spotX = x + Math.cos(spotAngle) * radius * 0.3;
+                const spotY = y + Math.sin(spotAngle * 0.5) * radius * 0.2;
+                ctx.fillStyle = 'rgba(30, 64, 175, 0.6)';
+                ctx.beginPath();
+                ctx.ellipse(spotX, spotY, radius * 0.25, radius * 0.15, spotAngle, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.restore();
+            
+            // Saturn's rings (front part)
+            if (planet.hasRings) {
+                drawSaturnRings(x, y, radius, planet.rotation, false);
+            }
+            
+            // Draw moons
+            planet.moons.forEach(moon => {
+                moon.angle += moon.speed;
+                const moonX = planetX + Math.cos(moon.angle) * moon.distance;
+                const moonY = planetY + Math.sin(moon.angle) * moon.distance;
+                
+                const mx = (moonX - camera.x) * camera.zoom + canvas.width / 2;
+                const my = (moonY - camera.y) * camera.zoom + canvas.height / 2;
+                const mr = moon.radius * camera.zoom;
+                
+                // Moon glow
+                const moonGlow = ctx.createRadialGradient(mx, my, mr * 0.5, mx, my, mr * 1.5);
+                moonGlow.addColorStop(0, moon.color + '40');
+                moonGlow.addColorStop(1, 'transparent');
+                ctx.beginPath();
+                ctx.arc(mx, my, mr * 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = moonGlow;
+                ctx.fill();
+                
+                // Moon body
+                const moonGradient = ctx.createRadialGradient(mx - mr * 0.3, my - mr * 0.3, 0, mx, my, mr);
+                moonGradient.addColorStop(0, lightenColor(moon.color, 20));
+                moonGradient.addColorStop(1, darkenColor(moon.color, 20));
+                
+                ctx.beginPath();
+                ctx.arc(mx, my, mr, 0, Math.PI * 2);
+                ctx.fillStyle = moonGradient;
+                ctx.fill();
+            });
             
             // Planet name label (only when zoomed in enough)
             if (camera.zoom > 0.5) {
@@ -1034,6 +1243,190 @@
                 ctx.textAlign = 'center';
                 ctx.fillText(planet.name.toUpperCase(), x, y + radius + 20 * camera.zoom);
             }
+        }
+
+        function drawEarthDetails(x, y, radius, rotation, time) {
+            // Continents (simplified shapes that rotate)
+            ctx.fillStyle = '#22c55e';
+            
+            // Create rotating continent effect
+            const continents = [
+                { cx: 0.2, cy: 0.1, w: 0.25, h: 0.2 },   // North America
+                { cx: 0.3, cy: 0.4, w: 0.15, h: 0.25 },  // South America
+                { cx: 0.55, cy: 0.15, w: 0.2, h: 0.15 }, // Europe
+                { cx: 0.55, cy: 0.3, w: 0.25, h: 0.35 }, // Africa
+                { cx: 0.75, cy: 0.2, w: 0.3, h: 0.25 },  // Asia
+                { cx: 0.85, cy: 0.55, w: 0.15, h: 0.15 } // Australia
+            ];
+            
+            const rotOffset = (rotation % (Math.PI * 2)) / (Math.PI * 2);
+            
+            continents.forEach(cont => {
+                let cx = ((cont.cx + rotOffset) % 1) * radius * 2 + x - radius;
+                let cy = cont.cy * radius * 2 + y - radius;
+                
+                // Check if visible on sphere
+                const distFromCenter = Math.sqrt(Math.pow(cx - x, 2) + Math.pow(cy - y, 2));
+                if (distFromCenter < radius * 0.85) {
+                    const scale = 1 - (distFromCenter / radius) * 0.3;
+                    ctx.beginPath();
+                    ctx.ellipse(cx, cy, cont.w * radius * scale, cont.h * radius * scale, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+            
+            // Clouds
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            for (let i = 0; i < 5; i++) {
+                const cloudAngle = rotation * 1.2 + i * 1.2;
+                const cloudY = (i / 5 - 0.5) * radius * 1.5;
+                const cloudX = x + Math.sin(cloudAngle + i) * radius * 0.6;
+                const cloudDist = Math.sqrt(Math.pow(cloudX - x, 2) + Math.pow(cloudY, 2));
+                if (cloudDist < radius * 0.9) {
+                    ctx.beginPath();
+                    ctx.ellipse(cloudX, y + cloudY, radius * 0.3, radius * 0.08, cloudAngle, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        function drawCraters(x, y, radius, rotation) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            const craters = [
+                { angle: 0.5, dist: 0.3, size: 0.15 },
+                { angle: 1.2, dist: 0.5, size: 0.1 },
+                { angle: 2.5, dist: 0.4, size: 0.12 },
+                { angle: 3.8, dist: 0.6, size: 0.08 },
+                { angle: 5.0, dist: 0.2, size: 0.1 }
+            ];
+            
+            craters.forEach(crater => {
+                const cx = x + Math.cos(crater.angle + rotation * 0.5) * radius * crater.dist;
+                const cy = y + Math.sin(crater.angle + rotation * 0.5) * radius * crater.dist;
+                const distFromCenter = Math.sqrt(Math.pow(cx - x, 2) + Math.pow(cy - y, 2));
+                if (distFromCenter < radius * 0.8) {
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, radius * crater.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+        }
+
+        function drawJupiterDetails(x, y, radius, rotation, time) {
+            // Bands
+            const bands = [
+                { y: -0.6, color: 'rgba(180, 100, 50, 0.4)' },
+                { y: -0.3, color: 'rgba(200, 150, 100, 0.3)' },
+                { y: 0, color: 'rgba(180, 100, 50, 0.4)' },
+                { y: 0.3, color: 'rgba(200, 150, 100, 0.3)' },
+                { y: 0.6, color: 'rgba(180, 100, 50, 0.4)' }
+            ];
+            
+            bands.forEach(band => {
+                ctx.fillStyle = band.color;
+                ctx.fillRect(x - radius, y + band.y * radius - radius * 0.1, radius * 2, radius * 0.2);
+            });
+            
+            // Great Red Spot
+            const spotAngle = rotation;
+            const spotX = x + Math.cos(spotAngle) * radius * 0.4;
+            const spotY = y + radius * 0.25;
+            
+            // Check if spot is on visible side
+            const distFromCenter = Math.abs(spotX - x);
+            if (distFromCenter < radius * 0.7) {
+                // Spot shadow
+                ctx.fillStyle = 'rgba(139, 69, 19, 0.6)';
+                ctx.beginPath();
+                ctx.ellipse(spotX, spotY, radius * 0.22, radius * 0.14, 0.2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Spot main color
+                const spotGradient = ctx.createRadialGradient(spotX, spotY, 0, spotX, spotY, radius * 0.2);
+                spotGradient.addColorStop(0, 'rgba(220, 80, 60, 0.9)');
+                spotGradient.addColorStop(0.5, 'rgba(200, 60, 40, 0.8)');
+                spotGradient.addColorStop(1, 'rgba(160, 50, 30, 0.7)');
+                
+                ctx.fillStyle = spotGradient;
+                ctx.beginPath();
+                ctx.ellipse(spotX, spotY, radius * 0.2, radius * 0.12, 0.2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Swirl effect
+                ctx.strokeStyle = 'rgba(180, 60, 40, 0.5)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for (let i = 0; i < 3; i++) {
+                    const swirlAngle = rotation * 2 + i * 2;
+                    ctx.ellipse(spotX, spotY, radius * (0.15 - i * 0.03), radius * (0.09 - i * 0.02), swirlAngle, 0, Math.PI * 2);
+                }
+                ctx.stroke();
+            }
+        }
+
+        function drawSaturnRings(x, y, radius, rotation, behind) {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            const tilt = 0.4;
+            
+            if (behind) {
+                // Draw back half of rings
+                ctx.scale(1, tilt);
+                
+                // Outer ring
+                ctx.strokeStyle = 'rgba(234, 179, 8, 0.4)';
+                ctx.lineWidth = 8 * camera.zoom;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius * 2.2, 0, Math.PI);
+                ctx.stroke();
+                
+                // Middle ring
+                ctx.strokeStyle = 'rgba(251, 191, 36, 0.5)';
+                ctx.lineWidth = 6 * camera.zoom;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius * 1.9, 0, Math.PI);
+                ctx.stroke();
+                
+                // Inner ring
+                ctx.strokeStyle = 'rgba(253, 224, 71, 0.4)';
+                ctx.lineWidth = 4 * camera.zoom;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius * 1.6, 0, Math.PI);
+                ctx.stroke();
+            } else {
+                // Draw front half of rings
+                ctx.scale(1, tilt);
+                
+                // Outer ring
+                ctx.strokeStyle = 'rgba(234, 179, 8, 0.6)';
+                ctx.lineWidth = 8 * camera.zoom;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius * 2.2, Math.PI, Math.PI * 2);
+                ctx.stroke();
+                
+                // Middle ring
+                ctx.strokeStyle = 'rgba(251, 191, 36, 0.7)';
+                ctx.lineWidth = 6 * camera.zoom;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius * 1.9, Math.PI, Math.PI * 2);
+                ctx.stroke();
+                
+                // Inner ring
+                ctx.strokeStyle = 'rgba(253, 224, 71, 0.6)';
+                ctx.lineWidth = 4 * camera.zoom;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius * 1.6, Math.PI, Math.PI * 2);
+                ctx.stroke();
+                
+                // Ring shadow on planet
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.beginPath();
+                ctx.ellipse(0, -radius * 0.3 / tilt, radius * 0.9, radius * 0.15 / tilt, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.restore();
         }
 
         function drawAsteroid(asteroid, time) {
@@ -1100,117 +1493,206 @@
             }
         }
 
-        function drawComet(comet) {
-            // Update position
+        function drawComet(comet, time) {
+            // Update position (slow and majestic)
             comet.x += comet.vx;
             comet.y += comet.vy;
+            comet.age++;
+            comet.coreGlow = Math.sin(time * 0.01) * 0.2 + 0.8;
             
-            // Add to tail
-            comet.tail.unshift({ x: comet.x, y: comet.y });
+            // Add to tail (longer tail)
+            comet.tail.unshift({ x: comet.x, y: comet.y, age: 0 });
             if (comet.tail.length > comet.tailLength) {
                 comet.tail.pop();
             }
+            
+            // Age tail particles
+            comet.tail.forEach(t => t.age++);
             
             const x = (comet.x - camera.x) * camera.zoom + canvas.width / 2;
             const y = (comet.y - camera.y) * camera.zoom + canvas.height / 2;
             const radius = comet.radius * camera.zoom;
             
-            // Draw tail
-            for (let i = 0; i < comet.tail.length; i++) {
+            // Calculate tail direction
+            const tailDirX = comet.tail.length > 1 ? comet.tail[1].x - comet.x : -comet.vx;
+            const tailDirY = comet.tail.length > 1 ? comet.tail[1].y - comet.y : -comet.vy;
+            
+            // Draw spectacular tail
+            for (let i = comet.tail.length - 1; i >= 0; i--) {
                 const t = comet.tail[i];
                 const tx = (t.x - camera.x) * camera.zoom + canvas.width / 2;
                 const ty = (t.y - camera.y) * camera.zoom + canvas.height / 2;
-                const alpha = 1 - i / comet.tailLength;
-                const tailRadius = radius * (1 - i / comet.tailLength) * 0.8;
+                const progress = i / comet.tailLength;
+                const alpha = (1 - progress) * 0.8;
+                const tailRadius = radius * (1 - progress * 0.7);
+                
+                // Outer glow
+                const outerGlow = ctx.createRadialGradient(tx, ty, 0, tx, ty, tailRadius * 3);
+                outerGlow.addColorStop(0, `rgba(135, 206, 235, ${alpha * 0.3})`);
+                outerGlow.addColorStop(0.5, `rgba(100, 180, 255, ${alpha * 0.15})`);
+                outerGlow.addColorStop(1, 'transparent');
                 
                 ctx.beginPath();
+                ctx.arc(tx, ty, tailRadius * 3, 0, Math.PI * 2);
+                ctx.fillStyle = outerGlow;
+                ctx.fill();
+                
+                // Core tail
+                ctx.beginPath();
                 ctx.arc(tx, ty, tailRadius, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(135, 206, 235, ${alpha * 0.5})`;
+                ctx.fillStyle = `rgba(200, 230, 255, ${alpha * 0.6})`;
                 ctx.fill();
             }
             
-            // Draw comet head
-            const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-            gradient.addColorStop(0, '#ffffff');
-            gradient.addColorStop(0.5, '#87ceeb');
-            gradient.addColorStop(1, 'rgba(135, 206, 235, 0.3)');
+            // Draw comet coma (fuzzy atmosphere)
+            const comaGradient = ctx.createRadialGradient(x, y, 0, x, y, radius * 4);
+            comaGradient.addColorStop(0, `rgba(255, 255, 255, ${0.8 * comet.coreGlow})`);
+            comaGradient.addColorStop(0.2, `rgba(200, 230, 255, ${0.5 * comet.coreGlow})`);
+            comaGradient.addColorStop(0.5, `rgba(135, 206, 235, ${0.2 * comet.coreGlow})`);
+            comaGradient.addColorStop(1, 'transparent');
+            
+            ctx.beginPath();
+            ctx.arc(x, y, radius * 4, 0, Math.PI * 2);
+            ctx.fillStyle = comaGradient;
+            ctx.fill();
+            
+            // Draw comet nucleus (bright core)
+            const nucleusGradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+            nucleusGradient.addColorStop(0, '#ffffff');
+            nucleusGradient.addColorStop(0.3, '#e0f2fe');
+            nucleusGradient.addColorStop(0.7, '#7dd3fc');
+            nucleusGradient.addColorStop(1, '#38bdf8');
             
             ctx.beginPath();
             ctx.arc(x, y, radius, 0, Math.PI * 2);
-            ctx.fillStyle = gradient;
+            ctx.fillStyle = nucleusGradient;
             ctx.fill();
+            
+            // Sparkles around comet
+            for (let i = 0; i < 8; i++) {
+                const sparkleAngle = time * 0.005 + i * Math.PI / 4;
+                const sparkleDist = radius * 2 + Math.sin(time * 0.01 + i) * radius;
+                const sx = x + Math.cos(sparkleAngle) * sparkleDist;
+                const sy = y + Math.sin(sparkleAngle) * sparkleDist;
+                const sparkleSize = 2 * camera.zoom * (0.5 + Math.sin(time * 0.02 + i) * 0.5);
+                
+                ctx.beginPath();
+                ctx.arc(sx, sy, sparkleSize, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.5 + Math.sin(time * 0.02 + i) * 0.3})`;
+                ctx.fill();
+            }
         }
 
         function drawUAP(uap, time) {
-            // Zigzag movement
-            uap.zigzagTimer += 0.05;
-            const zigzag = Math.sin(uap.zigzagTimer * 5) * 2;
+            // Sharp angular movement - sudden direction changes
+            uap.moveTimer++;
             
-            // Move towards target with zigzag
-            const dx = uap.targetX - uap.x;
-            const dy = uap.targetY - uap.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            
-            if (dist > 10) {
-                uap.x += (dx / dist) * 4 + zigzag;
-                uap.y += (dy / dist) * 4;
+            if (uap.moveTimer >= uap.nextTurnTime) {
+                // Make a sharp 90-degree turn
+                const dx = uap.targetX - uap.x;
+                const dy = uap.targetY - uap.y;
+                const currentAngle = Math.atan2(dy, dx);
+                
+                // Choose perpendicular direction or continue
+                const turnChoice = Math.random();
+                let newAngle;
+                if (turnChoice < 0.4) {
+                    newAngle = currentAngle + Math.PI / 2; // 90 degree right
+                } else if (turnChoice < 0.8) {
+                    newAngle = currentAngle - Math.PI / 2; // 90 degree left
+                } else {
+                    newAngle = currentAngle; // Continue straight
+                }
+                
+                const speed = 4 + Math.random() * 3; // Variable high speed
+                uap.currentVx = Math.cos(newAngle) * speed;
+                uap.currentVy = Math.sin(newAngle) * speed;
+                uap.moveTimer = 0;
+                uap.nextTurnTime = Math.random() * 25 + 15; // Time until next turn
             }
             
+            // Move with current velocity
+            uap.x += uap.currentVx;
+            uap.y += uap.currentVy;
+            
+            // Add to trail
+            uap.trail.unshift({ x: uap.x, y: uap.y });
+            if (uap.trail.length > 12) uap.trail.pop();
+            
             uap.phase += 0.1;
+            uap.pulsePhase += 0.08;
             uap.life -= 0.016;
             
             const x = (uap.x - camera.x) * camera.zoom + canvas.width / 2;
             const y = (uap.y - camera.y) * camera.zoom + canvas.height / 2;
             const radius = uap.radius * camera.zoom;
             
-            // Eerie glow
-            const glowGradient = ctx.createRadialGradient(x, y, 0, x, y, radius * 4);
-            glowGradient.addColorStop(0, 'rgba(0, 255, 0, 0.3)');
-            glowGradient.addColorStop(0.5, 'rgba(0, 255, 0, 0.1)');
-            glowGradient.addColorStop(1, 'transparent');
+            // Draw faint trail
+            for (let i = 0; i < uap.trail.length; i++) {
+                const t = uap.trail[i];
+                const tx = (t.x - camera.x) * camera.zoom + canvas.width / 2;
+                const ty = (t.y - camera.y) * camera.zoom + canvas.height / 2;
+                const alpha = (1 - i / uap.trail.length) * 0.3;
+                
+                ctx.beginPath();
+                ctx.arc(tx, ty, radius * 0.4 * (1 - i / uap.trail.length), 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(200, 200, 200, ${alpha})`;
+                ctx.fill();
+            }
+            
+            // Subtle outer glow
+            const pulseSize = 1 + Math.sin(uap.pulsePhase) * 0.15;
+            const outerGlow = ctx.createRadialGradient(x, y, 0, x, y, radius * 3 * pulseSize);
+            outerGlow.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+            outerGlow.addColorStop(0.5, 'rgba(200, 200, 200, 0.1)');
+            outerGlow.addColorStop(1, 'transparent');
             
             ctx.beginPath();
-            ctx.arc(x, y, radius * 4, 0, Math.PI * 2);
-            ctx.fillStyle = glowGradient;
+            ctx.arc(x, y, radius * 3 * pulseSize, 0, Math.PI * 2);
+            ctx.fillStyle = outerGlow;
             ctx.fill();
             
-            // UFO shape - classic disc
+            // Tic-tac shape - smooth white/gray pill shape
             ctx.save();
             ctx.translate(x, y);
             
-            // Bottom dome light
+            // Rotate to face movement direction
+            const moveAngle = Math.atan2(uap.currentVy, uap.currentVx);
+            ctx.rotate(moveAngle);
+            
+            // Tic-tac body (elongated pill/capsule shape)
+            const length = radius * 2.5;
+            const width = radius;
+            
+            // Main body gradient
+            const bodyGradient = ctx.createLinearGradient(-length/2, -width, length/2, width);
+            bodyGradient.addColorStop(0, '#e5e7eb');
+            bodyGradient.addColorStop(0.3, '#ffffff');
+            bodyGradient.addColorStop(0.7, '#ffffff');
+            bodyGradient.addColorStop(1, '#d1d5db');
+            
+            // Draw pill shape
             ctx.beginPath();
-            ctx.ellipse(0, 5 * camera.zoom, radius * 0.3, radius * 0.15, 0, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(0, 255, 0, ${0.5 + Math.sin(uap.phase) * 0.3})`;
+            ctx.moveTo(-length/2 + width, -width);
+            ctx.lineTo(length/2 - width, -width);
+            ctx.arc(length/2 - width, 0, width, -Math.PI/2, Math.PI/2);
+            ctx.lineTo(-length/2 + width, width);
+            ctx.arc(-length/2 + width, 0, width, Math.PI/2, -Math.PI/2);
+            ctx.closePath();
+            
+            ctx.fillStyle = bodyGradient;
             ctx.fill();
             
-            // Main disc
-            ctx.beginPath();
-            ctx.ellipse(0, 0, radius, radius * 0.3, 0, 0, Math.PI * 2);
-            ctx.fillStyle = '#2a2a2a';
-            ctx.fill();
-            ctx.strokeStyle = `rgba(0, 255, 0, ${0.5 + Math.sin(uap.phase) * 0.3})`;
-            ctx.lineWidth = 2;
+            // Subtle edge highlight
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.lineWidth = 1 * camera.zoom;
             ctx.stroke();
             
-            // Top dome
+            // Subtle shine on top
             ctx.beginPath();
-            ctx.ellipse(0, -radius * 0.1, radius * 0.5, radius * 0.3, 0, Math.PI, 0);
-            ctx.fillStyle = 'rgba(100, 200, 100, 0.3)';
+            ctx.ellipse(0, -width * 0.4, length * 0.35, width * 0.3, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
             ctx.fill();
-            
-            // Blinking lights
-            const lightCount = 6;
-            for (let i = 0; i < lightCount; i++) {
-                const lightAngle = (Math.PI * 2 / lightCount) * i + uap.phase;
-                const lx = Math.cos(lightAngle) * radius * 0.8;
-                const ly = Math.sin(lightAngle) * radius * 0.2;
-                
-                ctx.beginPath();
-                ctx.arc(lx, ly, 2 * camera.zoom, 0, Math.PI * 2);
-                ctx.fillStyle = i % 2 === Math.floor(uap.phase) % 2 ? '#00ff00' : '#004400';
-                ctx.fill();
-            }
             
             ctx.restore();
         }
@@ -1358,20 +1840,21 @@
             maybeSpawnComet();
             for (let i = comets.length - 1; i >= 0; i--) {
                 const comet = comets[i];
-                drawComet(comet);
+                drawComet(comet, time);
                 
                 // Check if comet is visible and count it
-                const x = (comet.x - camera.x) * camera.zoom + canvas.width / 2;
-                const y = (comet.y - camera.y) * camera.zoom + canvas.height / 2;
+                const cx = (comet.x - camera.x) * camera.zoom + canvas.width / 2;
+                const cy = (comet.y - camera.y) * camera.zoom + canvas.height / 2;
                 
-                if (!comet.counted && x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
+                if (!comet.counted && cx > -100 && cx < canvas.width + 100 && cy > -100 && cy < canvas.height + 100) {
                     comet.counted = true;
                     cometCount++;
                     document.getElementById('cometCount').textContent = cometCount;
                 }
                 
-                // Remove off-screen comets
-                if (x < -200 || x > canvas.width + 200 || y < -200 || y > canvas.height + 200) {
+                // Remove comets that have traveled far enough
+                const distFromStart = Math.sqrt(comet.x * comet.x + comet.y * comet.y);
+                if (comet.age > 3000 || (comet.age > 500 && distFromStart > 1500)) {
                     comets.splice(i, 1);
                 }
             }
