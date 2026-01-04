@@ -452,7 +452,7 @@
 
         /* Comet - no alert needed */
 
-        /* Responsive */
+        /* Responsive - Tablet */
         @media (max-width: 768px) {
             .header {
                 padding: 15px 20px;
@@ -500,6 +500,125 @@
                 padding: 12px 20px;
             }
         }
+
+        /* Responsive - Mobile */
+        @media (max-width: 480px) {
+            .header {
+                padding: 10px 15px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .logo {
+                font-size: 0.9rem;
+                letter-spacing: 1px;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .nav-link {
+                font-size: 0.65rem;
+                letter-spacing: 1px;
+            }
+
+            .hero-content {
+                top: auto;
+                bottom: 120px;
+                left: 15px;
+                right: 15px;
+                transform: none;
+                max-width: none;
+                background: rgba(10, 10, 15, 0.7);
+                padding: 20px;
+                border-radius: 15px;
+                backdrop-filter: blur(10px);
+            }
+
+            .hero-tagline {
+                font-size: 0.65rem;
+                letter-spacing: 2px;
+                margin-bottom: 10px;
+            }
+
+            .hero-title {
+                font-size: 1.4rem;
+                margin-bottom: 12px;
+            }
+
+            .hero-description {
+                font-size: 0.8rem;
+                line-height: 1.5;
+                margin-bottom: 15px;
+            }
+
+            .cta-button {
+                padding: 10px 20px;
+                font-size: 0.7rem;
+                letter-spacing: 1px;
+            }
+
+            .stats-display {
+                top: 70px;
+                right: 15px;
+                bottom: auto;
+                background: rgba(10, 10, 15, 0.6);
+                padding: 10px;
+                border-radius: 8px;
+            }
+
+            .stat-item {
+                font-size: 0.6rem;
+                margin-bottom: 5px;
+            }
+
+            .instructions {
+                bottom: 15px;
+                left: 15px;
+                right: 15px;
+                transform: none;
+                font-size: 0.55rem;
+                padding: 10px 15px;
+                text-align: center;
+            }
+
+            .uap-alert {
+                bottom: auto;
+                top: 130px;
+                right: 15px;
+                font-size: 0.6rem;
+                padding: 6px 12px;
+            }
+
+            .about-panel {
+                padding: 60px 20px 20px;
+            }
+
+            .about-title {
+                font-size: 1.5rem;
+            }
+
+            .about-section h3 {
+                font-size: 0.75rem;
+            }
+
+            .about-section p {
+                font-size: 0.85rem;
+            }
+
+            .app-card {
+                padding: 15px;
+            }
+
+            .app-card h4 {
+                font-size: 0.9rem;
+            }
+
+            .app-card p {
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -544,7 +663,7 @@
     </div>
 
     <!-- Instructions -->
-    <div class="instructions ui-overlay">
+    <div class="instructions ui-overlay" id="instructions">
         <span>DRAG</span> TO EXPLORE • <span>CLICK</span> ASTEROIDS TO DESTROY • <span>SCROLL</span> TO ZOOM
     </div>
 
@@ -1775,18 +1894,41 @@
             }
         });
 
-        // Touch support
+        // Touch support with pinch-to-zoom
+        let initialPinchDistance = null;
+        let initialZoom = null;
+
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            const touch = e.touches[0];
-            camera.isDragging = true;
-            camera.lastX = touch.clientX;
-            camera.lastY = touch.clientY;
+            
+            if (e.touches.length === 2) {
+                // Pinch zoom start
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
+                initialZoom = camera.targetZoom;
+            } else if (e.touches.length === 1) {
+                // Single finger pan
+                const touch = e.touches[0];
+                camera.isDragging = true;
+                camera.lastX = touch.clientX;
+                camera.lastY = touch.clientY;
+            }
         });
 
         canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            if (camera.isDragging && e.touches.length === 1) {
+            
+            if (e.touches.length === 2 && initialPinchDistance !== null) {
+                // Pinch zoom
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const currentDistance = Math.sqrt(dx * dx + dy * dy);
+                
+                const scale = currentDistance / initialPinchDistance;
+                camera.targetZoom = Math.max(0.3, Math.min(3, initialZoom * scale));
+            } else if (e.touches.length === 1 && camera.isDragging) {
+                // Single finger pan
                 const touch = e.touches[0];
                 const dx = touch.clientX - camera.lastX;
                 const dy = touch.clientY - camera.lastY;
@@ -1797,8 +1939,14 @@
             }
         });
 
-        canvas.addEventListener('touchend', () => {
-            camera.isDragging = false;
+        canvas.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) {
+                initialPinchDistance = null;
+                initialZoom = null;
+            }
+            if (e.touches.length === 0) {
+                camera.isDragging = false;
+            }
         });
 
         // UI Functions
@@ -1895,6 +2043,12 @@
                 });
             }
         }, 10000);
+
+        // Update instructions for mobile/touch devices
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+            document.getElementById('instructions').innerHTML = 
+                '<span>DRAG</span> TO EXPLORE • <span>TAP</span> ASTEROIDS • <span>PINCH</span> TO ZOOM';
+        }
     </script>
 </body>
 </html>
