@@ -613,6 +613,7 @@ cvs.addEventListener('mousemove',e=>{if(cam.drag){const dx=e.clientX-cam.lx,dy=e
 cvs.addEventListener('mouseup',()=>cam.drag=false);
 cvs.addEventListener('mouseleave',()=>{cam.drag=false;hideTip();hidePlanetCard()});
 window.addEventListener('wheel',e=>{
+if(document.getElementById('sPanel').classList.contains('on'))return;
 e.preventDefault();
 if(scrollNav.freeMode){const zf=cam.tZoom<0.0001?(e.deltaY>0?.988:1.012):cam.tZoom<0.005?(e.deltaY>0?.985:1.015):cam.tZoom<0.1?(e.deltaY>0?.98:1.02):(e.deltaY>0?.87:1.13);cam.tZoom=Math.max(1e-9,Math.min(6,cam.tZoom*zf));cam.anim=false;
 // Zooming back into solar system — exit freeMode and snap to Neptune
