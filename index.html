@@ -55,6 +55,12 @@ a{color:inherit}
 
 /* ============ BACKDROP ============ */
 #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+.galaxy{position:fixed;inset:0;z-index:0;pointer-events:none;will-change:transform,opacity}
+.galaxy img{position:absolute;top:-16%;left:50%;width:min(1500px,140vw);height:auto;transform:translateX(-50%) rotate(-12deg);opacity:.52;mix-blend-mode:screen;filter:saturate(1.12) contrast(1.04);
+  -webkit-mask-image:radial-gradient(ellipse 52% 48% at 50% 50%,#000 30%,transparent 74%);
+  mask-image:radial-gradient(ellipse 52% 48% at 50% 50%,#000 30%,transparent 74%);
+  animation:galBreathe 80s ease-in-out infinite alternate}
+@keyframes galBreathe{to{transform:translateX(-50%) rotate(-12deg) scale(1.05)}}
 .nebula{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .nebula i{position:absolute;border-radius:50%;filter:blur(90px);will-change:transform;display:block}
 .n1{width:62vmax;height:62vmax;top:-24vmax;left:-14vmax;background:radial-gradient(circle,rgba(139,124,255,.16),transparent 65%);animation:drift1 52s ease-in-out infinite alternate}
@@ -154,6 +160,10 @@ h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.1rem,5.6vw,3.9rem);f
 .orbit b{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--ink-faint);font-weight:400;flex:none}
 .orbit span{font-size:.85rem;color:var(--ink-dim)}
 .orbit span em{font-style:normal;color:var(--ink);font-weight:500}
+.orbit a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line-bright);padding-bottom:1px;transition:color .3s,border-color .3s}
+.orbit a:hover{color:var(--cyan);border-color:var(--cyan)}
+.flink{display:inline-block;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);opacity:.75;text-decoration:none;transition:opacity .3s}
+.flink:hover{opacity:1}
 
 /* ============ CONTACT ============ */
 .contact{text-align:center;padding-bottom:clamp(120px,16vh,190px)}
@@ -166,6 +176,11 @@ h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.1rem,5.6vw,3.9rem);f
 .email:hover::after{transform:scaleX(1)}
 .copy{font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.22em;color:var(--ink-dim);background:transparent;border:1px solid var(--line-bright);border-radius:100px;padding:11px 20px;cursor:pointer;transition:color .3s,border-color .3s,background .3s;will-change:transform}
 .copy:hover{color:var(--cyan);border-color:var(--cyan);background:rgba(94,230,255,.06)}
+.offer{margin:72px auto 0;max-width:680px;padding:32px 36px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(160deg,rgba(16,18,36,.5),rgba(7,9,18,.4));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);text-align:center}
+.offer-k{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.3em;background:linear-gradient(120deg,#8b7cff,#5ee6ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;display:inline-block}
+.offer-t{font-size:.92rem;color:var(--ink-dim);line-height:1.75;margin:16px 0 24px}
+.offer-cta{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.2em;color:var(--ink);text-decoration:none;border:1px solid var(--line-bright);border-radius:100px;padding:12px 26px;display:inline-block;transition:color .3s,border-color .3s,background .3s,box-shadow .3s;will-change:transform}
+.offer-cta:hover{color:var(--cyan);border-color:var(--cyan);background:rgba(94,230,255,.06);box-shadow:0 0 26px rgba(94,230,255,.14)}
 
 /* ============ FOOTER ============ */
 footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:44px clamp(20px,4.5vw,44px);background:rgba(4,5,10,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
@@ -194,6 +209,10 @@ footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:44px
 @media(max-width:430px){
   .brand span{display:none}
 }
+@media(max-width:760px){
+  .galaxy img{width:190vw;top:-6%}
+  .offer{padding:26px 22px}
+}
 @media(hover:none){
   .card:hover{--ty:0px}
 }
@@ -208,6 +227,7 @@ footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:44px
 <body>
 <a class="skip" href="#apps">Skip to content</a>
 <canvas id="stars" aria-hidden="true"></canvas>
+<div class="galaxy" id="galaxy" aria-hidden="true"><img src="/assets/m31.jpg" alt="" width="2000" height="1313" decoding="async"></div>
 <div class="nebula" aria-hidden="true"><i class="n1"></i><i class="n2"></i><i class="n3"></i></div>
 <div class="progress" id="progress" aria-hidden="true"></div>
 
@@ -270,6 +290,7 @@ footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:44px
         <h3>AppFactory</h3>
         <span class="fsub">The launch pipeline</span>
         <p>An internal automation system that takes an app from concept to shipped — store listings, screenshots, localization, and compliance handled in hours, not weeks. It's why the fleet grows so fast without losing finish.</p>
+        <a class="flink" href="#appfactory-offer">Available for license →</a>
       </article>
       <article class="fcard rv" style="--d:.1s">
         <span class="fnum">SYS · 02</span>
@@ -286,7 +307,7 @@ footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:44px
     </div>
     <div class="orbit rv">
       <b>ALSO IN ORBIT</b>
-      <span><em>BenchCalcs</em> — a network of single-purpose engineering calculators</span>
+      <span><em><a href="https://benchcalcs.com" target="_blank" rel="noopener">BenchCalcs</a></em> — a network of single-purpose engineering calculators</span>
       <span><em>Dealer Ops Daily</em> — an automated intelligence brief for dealership operators</span>
     </div>
   </section>
@@ -299,6 +320,11 @@ footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:44px
     <div class="email-wrap rv" style="--d:.24s">
       <a class="email magnetic" href="mailto:michael@andromedakinship.com">michael@andromedakinship.com</a>
       <button class="copy magnetic" id="copyBtn" type="button" aria-label="Copy email address">COPY</button>
+    </div>
+    <div class="offer rv" id="appfactory-offer" style="--d:.32s">
+      <p class="offer-k">APPFACTORY — AVAILABLE FOR LICENSE OR ACQUISITION</p>
+      <p class="offer-t">The launch pipeline behind this studio is itself a product. The complete process — tooling, automations, and playbooks that carry an app from concept to the App Store — can be licensed, or the rights acquired outright.</p>
+      <a class="offer-cta magnetic" href="mailto:michael@andromedakinship.com?subject=AppFactory%20pricing%20inquiry">INQUIRE FOR PRICING</a>
     </div>
   </section>
 
@@ -314,6 +340,7 @@ footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:44px
       <a href="https://apps.apple.com/us/developer/michael-dube/id1858655640" target="_blank" rel="noopener">Developer page</a>
       <a href="/legal/privacy-policy.html">Privacy</a>
       <a href="/legal/terms-of-service.html">Terms</a>
+      <a href="https://commons.wikimedia.org/wiki/File:Andromeda_Galaxy_(with_h-alpha).jpg" target="_blank" rel="noopener">M31 image: Adam Evans · CC BY 2.0</a>
     </nav>
     <p class="foot-tag">MADE ON EARTH · POINTED AT ANDROMEDA</p>
   </div>
@@ -452,6 +479,7 @@ io.observe(document.getElementById('stats'));
 /* ================= NAV / SCROLL ================= */
 var nav=document.getElementById('nav'), progress=document.getElementById('progress');
 var heroInner=document.getElementById('heroInner');
+var galaxy=document.getElementById('galaxy');
 var ticking=false;
 addEventListener('scroll',function(){
   if(ticking)return;ticking=true;
@@ -463,6 +491,10 @@ addEventListener('scroll',function(){
     if(!REDUCED&&heroInner&&y<innerHeight){
       heroInner.style.transform='translateY('+y*0.32+'px)';
       heroInner.style.opacity=Math.max(1-y/(innerHeight*0.85),0);
+    }
+    if(!REDUCED&&galaxy){
+      galaxy.style.transform='translateY('+y*0.16+'px)';
+      galaxy.style.opacity=Math.max(1-y/(innerHeight*1.15),0);
     }
     ticking=false;
   });
