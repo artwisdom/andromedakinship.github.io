@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FDA Recall &amp; 510(k) Alerts for Discord | RegPing FDA</title>
+<meta name="description" content="RegPing FDA pushes real-time FDA recall, 510(k) clearance, and device adverse-event alerts into your team's Discord — sourced from the FDA recalls feed and openFDA APIs. $9.99/server/month.">
+<link rel="canonical" href="https://andromedakinship.com/regping/fda/">
+<meta name="theme-color" content="#04050a">
+<meta name="keywords" content="FDA recall alerts, FDA 510(k) clearance notifications, medical device recall monitoring, openFDA alerts, MAUDE adverse event alerts, FDA regulatory monitoring tool">
+<meta property="og:type" content="product">
+<meta property="og:title" content="RegPing FDA — FDA recall &amp; 510(k) alerts for Discord">
+<meta property="og:description" content="Real-time FDA recalls, 510(k) clearances, and device adverse-event reports, delivered to your team's Discord channel.">
+<meta property="og:url" content="https://andromedakinship.com/regping/fda/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" href="/assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/regping/regping.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"RegPing FDA","applicationCategory":"BusinessApplication","operatingSystem":"Discord","description":"A Discord bot that monitors FDA recalls, 510(k) clearances, and device adverse-event reports and posts real-time plain-language alerts into a team's channel.","url":"https://andromedakinship.com/regping/fda/","publisher":{"@type":"Organization","name":"Andromeda Kinship","url":"https://andromedakinship.com"},"offers":{"@type":"Offer","price":"9.99","priceCurrency":"USD","description":"Per Discord server, per month"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+{"@type":"ListItem","position":1,"name":"Andromeda Kinship","item":"https://andromedakinship.com/"},
+{"@type":"ListItem","position":2,"name":"RegPing","item":"https://andromedakinship.com/regping/"},
+{"@type":"ListItem","position":3,"name":"FDA","item":"https://andromedakinship.com/regping/fda/"}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"How do I get notified of FDA recalls in real time?","acceptedAnswer":{"@type":"Answer","text":"Add the RegPing FDA bot to your Discord server and point it at a channel. It checks the FDA recalls feed and the openFDA APIs every 30 minutes and posts a summarized alert with a link to the FDA's own notice whenever a new recall, clearance, or adverse-event report publishes."}},
+{"@type":"Question","name":"What FDA sources does RegPing FDA monitor?","acceptedAnswer":{"@type":"Answer","text":"It monitors the official FDA recalls RSS feed for fast headline triggers, plus the openFDA device-recall, 510(k) clearance, and adverse-event (MAUDE) APIs for structured detail such as recall classification, recalling firm, and distribution scope."}},
+{"@type":"Question","name":"Who is RegPing FDA for?","acceptedAnswer":{"@type":"Answer","text":"Compliance officers and regulatory-affairs managers at medical-device, pharmaceutical, and food companies — especially small and mid-sized teams that need real-time awareness but can't justify a five-figure enterprise regtech platform."}},
+{"@type":"Question","name":"How much does RegPing FDA cost?","acceptedAnswer":{"@type":"Answer","text":"$9.99 per Discord server per month. One subscription covers everyone in that server."}}]}
+</script>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hdr">
+    <a class="brand" href="/"><img src="/assets/icon.png" alt="">Andromeda Kinship</a>
+    <a class="back" href="/regping/">← All RegPing bots</a>
+  </header>
+  <p class="crumbs"><a href="/">Home</a> › <a href="/regping/">RegPing</a> › FDA</p>
+
+  <section class="hero">
+    <span class="kick mono">RegPing FDA · $9.99 / server / mo</span>
+    <h1>FDA recalls, clearances &amp; adverse events<br><span class="g">in your Discord, in real time.</span></h1>
+    <p class="sub">RegPing FDA watches the FDA's public feeds and posts a plain-language alert into your channel the moment a recall, 510(k) clearance, or device adverse-event report publishes — so your regulatory-affairs team stops refreshing FDA.gov.</p>
+    <div class="cta-row">
+      <a class="add" href="https://discord.com/oauth2/authorize?client_id=1507559918608191528" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4.4A18 18 0 0 0 15.5 3l-.3.5a16 16 0 0 1 4 .9C16.8 3.1 13.7 3 12 3s-4.8.1-7.2 1.4a16 16 0 0 1 4-.9L8.5 3A18 18 0 0 0 4 4.4 19 19 0 0 0 1 17a18 18 0 0 0 5.4 2.7l.6-1a12 12 0 0 1-2-1l.5-.3a13 13 0 0 0 11 0l.5.3a12 12 0 0 1-2 1l.6 1A18 18 0 0 0 23 17 19 19 0 0 0 20 4.4ZM9 14.5c-.7 0-1.3-.7-1.3-1.5S8.3 11.5 9 11.5s1.3.7 1.3 1.5S9.7 14.5 9 14.5Zm6 0c-.7 0-1.3-.7-1.3-1.5s.6-1.5 1.3-1.5 1.3.7 1.3 1.5-.6 1.5-1.3 1.5Z"/></svg>Add to Discord</a>
+      <span class="price-lg"><b>$9.99</b> / server / month · covers your whole team</span>
+    </div>
+  </section>
+
+  <section class="prose">
+    <h2>What RegPing FDA monitors</h2>
+    <p>One missed recall classification or 510(k) clearance can mean a scramble. RegPing FDA pairs a fast RSS trigger with the structured openFDA APIs so you get the headline immediately and the detail as it becomes available — four public sources, one channel:</p>
+    <div class="srcs">
+      <div class="src"><b>FDA recalls (RSS)</b><span>The official recalls feed for fast headline triggers the moment an action posts.</span></div>
+      <div class="src"><b>openFDA device recalls</b><span>Recall classification, recalling firm, reason, lot codes, and distribution scope.</span></div>
+      <div class="src"><b>openFDA 510(k) clearances</b><span>New device clearances — useful for competitive and predicate-device tracking.</span></div>
+      <div class="src"><b>openFDA adverse events (MAUDE)</b><span>Device adverse-event reports surfaced as they're published.</span></div>
+    </div>
+    <p>The recall pipeline pairs each RSS headline with its matching openFDA record, so an alert that starts as a one-line notice fills in with classification and distribution detail as the structured data catches up.</p>
+
+    <h2>Who it's for</h2>
+    <p>RegPing FDA is built for <strong>compliance officers and regulatory-affairs managers</strong> at medical-device, pharmaceutical, and food companies — particularly lean teams that need to know about recalls and clearances the moment they publish, but can't justify a five-figure enterprise regtech contract. If your team already lives in Discord, the alerts arrive where you're already working.</p>
+
+    <h2>Why real-time beats the weekly digest</h2>
+    <p>Recalls and adverse-event signals are time-sensitive. A weekly newsletter or a manual morning check of FDA.gov leaves a gap measured in days — long enough for a distribution decision, a customer inquiry, or an audit question to land before you've seen the notice. RegPing closes that gap to roughly half an hour, and every alert links straight to the FDA's own page so your team can act from the primary source.</p>
+  </section>
+
+  <section class="how">
+    <h2>How it works</h2>
+    <p class="lead">Add the bot, choose a channel, set your filters. It runs on a 30-minute cycle from there.</p>
+    <div class="steps">
+      <div class="step"><span class="n">01</span><h4>Add the bot</h4><p>Install RegPing FDA and point it at a channel such as <code>#fda-alerts</code>.</p></div>
+      <div class="step"><span class="n">02</span><h4>Set filters</h4><p>Use <code>/filter</code> to scope by action type and minimum severity.</p></div>
+      <div class="step"><span class="n">03</span><h4>It watches</h4><p>Every 30 minutes it checks the FDA feed and openFDA APIs and de-duplicates.</p></div>
+      <div class="step"><span class="n">04</span><h4>You get pinged</h4><p>A clean embed with the detail and a link to the FDA notice.</p></div>
+    </div>
+  </section>
+
+  <div class="cta-row">
+    <a class="add" href="https://discord.com/oauth2/authorize?client_id=1507559918608191528" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4.4A18 18 0 0 0 15.5 3l-.3.5a16 16 0 0 1 4 .9C16.8 3.1 13.7 3 12 3s-4.8.1-7.2 1.4a16 16 0 0 1 4-.9L8.5 3A18 18 0 0 0 4 4.4 19 19 0 0 0 1 17a18 18 0 0 0 5.4 2.7l.6-1a12 12 0 0 1-2-1l.5-.3a13 13 0 0 0 11 0l.5.3a12 12 0 0 1-2 1l.6 1A18 18 0 0 0 23 17 19 19 0 0 0 20 4.4ZM9 14.5c-.7 0-1.3-.7-1.3-1.5S8.3 11.5 9 11.5s1.3.7 1.3 1.5S9.7 14.5 9 14.5Zm6 0c-.7 0-1.3-.7-1.3-1.5s.6-1.5 1.3-1.5 1.3.7 1.3 1.5-.6 1.5-1.3 1.5Z"/></svg>Add RegPing FDA to Discord</a>
+  </div>
+
+  <section class="faqs">
+    <h2>FDA monitoring FAQ</h2>
+    <details open><summary>How do I get notified of FDA recalls in real time?</summary><div class="a">Add the RegPing FDA bot to your server and point it at a channel. It checks the FDA recalls feed and the openFDA APIs every 30 minutes and posts a summarized alert — with a link to the FDA's own notice — whenever a new recall, clearance, or adverse-event report publishes.</div></details>
+    <details><summary>What FDA sources does it monitor?</summary><div class="a">The official FDA recalls RSS feed for fast headline triggers, plus the openFDA device-recall, 510(k) clearance, and adverse-event (MAUDE) APIs for structured detail like recall classification, recalling firm, and distribution scope.</div></details>
+    <details><summary>Who is RegPing FDA for?</summary><div class="a">Compliance officers and regulatory-affairs managers at medical-device, pharma, and food companies — especially small and mid-sized teams that need real-time awareness without an enterprise regtech platform.</div></details>
+    <details><summary>Is this legal or compliance advice?</summary><div class="a">No. RegPing FDA is an awareness and monitoring tool. It surfaces and links the original FDA notice and is not a substitute for reading the primary source or consulting counsel.</div></details>
+    <details><summary>How much does it cost?</summary><div class="a">$9.99 per Discord server per month — one subscription covers your whole team.</div></details>
+  </section>
+
+  <section class="siblings">
+    <h2>Other RegPing bots</h2>
+    <div class="sib-grid">
+      <a class="sib" href="/regping/financial/"><span class="k">Financial · $19.99</span><h3>RegPing Financial</h3><p>SEC, FINRA, OCC, FDIC, NYDFS, FinCEN &amp; FTC alerts.</p></a>
+      <a class="sib" href="/regping/cannabis/"><span class="k">Cannabis · $14.99</span><h3>RegPing Cannabis</h3><p>State cannabis regulators across your markets.</p></a>
+      <a class="sib" href="/regping/ai-privacy/"><span class="k">AI &amp; Privacy · $19.99</span><h3>RegPing AI &amp; Privacy</h3><p>CCPA, GDPR/EDPB &amp; EU AI Act moves.</p></a>
+    </div>
+  </section>
+
+  <footer>
+    <p class="legal">RegPing FDA republishes facts from public FDA sources on a quote-and-link basis, and every alert links to the primary FDA notice. It is a monitoring and awareness service — <b>not legal advice</b>, and not a substitute for reading the source or consulting counsel.</p>
+    <nav>
+      <a href="/regping/">All RegPing bots</a>
+      <a href="/regping/privacy.html">Privacy</a>
+      <a href="/regping/terms.html">Terms</a>
+      <a href="mailto:michael@complianceghost.com">Contact</a>
+      <a href="/">Andromeda Kinship ↗</a>
+    </nav>
+  </footer>
+
+</div>
+</body>
+</html>
