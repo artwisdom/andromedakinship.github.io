@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Monitor FDA Recalls in Real Time | RegPing</title>
+<meta name="description" content="A practical guide to real-time FDA recall monitoring: the FDA recalls feed and openFDA APIs, what recall classes mean, why the weekly digest leaves a gap, and how to get alerts as they publish.">
+<link rel="canonical" href="https://andromedakinship.com/regping/guides/monitor-fda-recalls/">
+<meta name="theme-color" content="#04050a">
+<meta name="keywords" content="monitor FDA recalls, FDA recall notification, real-time FDA recall alerts, openFDA, 510(k) tracking, medical device recall monitoring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="How to monitor FDA recalls in real time">
+<meta property="og:description" content="The FDA sources that matter, what recall classes mean, and how to get alerts as recalls publish.">
+<meta property="og:url" content="https://andromedakinship.com/regping/guides/monitor-fda-recalls/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" href="/assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/regping/regping.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"How to monitor FDA recalls in real time","description":"The FDA recalls feed and openFDA APIs, what recall classes mean, and how to get alerts as recalls publish.","datePublished":"2026-06-28","dateModified":"2026-06-28","author":{"@type":"Organization","name":"RegPing"},"publisher":{"@type":"Organization","name":"Andromeda Kinship","url":"https://andromedakinship.com"},"mainEntityOfPage":"https://andromedakinship.com/regping/guides/monitor-fda-recalls/"}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+{"@type":"ListItem","position":1,"name":"Andromeda Kinship","item":"https://andromedakinship.com/"},
+{"@type":"ListItem","position":2,"name":"RegPing","item":"https://andromedakinship.com/regping/"},
+{"@type":"ListItem","position":3,"name":"Guides","item":"https://andromedakinship.com/regping/guides/"},
+{"@type":"ListItem","position":4,"name":"Monitor FDA recalls","item":"https://andromedakinship.com/regping/guides/monitor-fda-recalls/"}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Where does the FDA publish recalls?","acceptedAnswer":{"@type":"Answer","text":"The FDA posts recalls on its recalls, market withdrawals & safety alerts page (with an RSS feed), and the structured data is available through the openFDA APIs for drug, device, and food enforcement reports."}},
+{"@type":"Question","name":"What do FDA recall classes mean?","acceptedAnswer":{"@type":"Answer","text":"Class I is the most serious — a reasonable probability of serious harm or death; Class II involves temporary or reversible harm; Class III is unlikely to cause harm. The class is assigned by the FDA and is a key triage signal."}},
+{"@type":"Question","name":"How do I get notified of FDA recalls in real time?","acceptedAnswer":{"@type":"Answer","text":"Subscribe to the FDA recalls RSS feed or poll the openFDA APIs, then route new items to wherever your team works. RegPing FDA does this automatically and posts summarized alerts into your Discord channel."}}]}
+</script>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hdr">
+    <a class="brand" href="/"><img src="/assets/icon.png" alt="">Andromeda Kinship</a>
+    <a class="back" href="/regping/guides/">← All guides</a>
+  </header>
+  <p class="crumbs"><a href="/">Home</a> › <a href="/regping/">RegPing</a> › <a href="/regping/guides/">Guides</a> › Monitor FDA recalls</p>
+
+  <section class="hero">
+    <span class="kick mono">Guide · FDA</span>
+    <h1>How to monitor FDA recalls<br><span class="g">in real time</span></h1>
+  </section>
+
+  <article class="prose">
+    <p class="lede">For a medical-device, pharma, or food company, an FDA recall isn't just news — it can trigger a distribution decision, a customer notification, or an audit question within hours. Here's how to catch recalls as they publish instead of finding out from a weekly digest or a customer email.</p>
+
+    <h2>Where the FDA actually publishes</h2>
+    <p>FDA recall information lives in a few public places, and the trick is using the fast one and the detailed one together:</p>
+    <ul>
+      <li><strong>FDA recalls RSS feed</strong> — the official "Recalls, Market Withdrawals &amp; Safety Alerts" feed. This is your fastest trigger: it carries the headline the moment an action posts.</li>
+      <li><strong>openFDA enforcement APIs</strong> — structured records for device, drug, and food recalls, including recall classification, recalling firm, reason, product description, and distribution scope. This is the detail that fills in around the headline.</li>
+      <li><strong>openFDA 510(k) and adverse-event (MAUDE) endpoints</strong> — for device teams tracking new clearances and adverse-event reports alongside recalls.</li>
+    </ul>
+    <p>The headline often publishes before the full structured record is available, so the most useful setup pairs the RSS trigger with the openFDA record and updates the alert as classification and distribution detail catch up.</p>
+
+    <h2>Read the recall class first</h2>
+    <p>Every FDA recall carries a classification that tells you how serious it is — it's the single most useful triage signal:</p>
+    <ul>
+      <li><strong>Class I</strong> — a reasonable probability of serious adverse health consequences or death. Drop everything.</li>
+      <li><strong>Class II</strong> — may cause temporary or medically reversible harm; serious harm is unlikely.</li>
+      <li><strong>Class III</strong> — unlikely to cause harm, but still a violation worth noting.</li>
+    </ul>
+    <p>If you only have time to act on one thing, act on Class I. Building your alerting so the class is visible at a glance saves your team from reading every notice in full just to triage.</p>
+
+    <h2>Why real-time beats the weekly digest</h2>
+    <p>A weekly newsletter or a manual morning check of FDA.gov leaves a gap measured in days. For time-sensitive recall and adverse-event signals, that gap is where the risk lives — a shipment goes out, a customer calls, an auditor asks. Real-time monitoring shrinks the gap to roughly the length of one polling cycle.</p>
+
+    <div class="gcta">
+      <h3>RegPing FDA does this for you</h3>
+      <p>It watches the FDA recalls feed and the openFDA APIs and posts summarized, class-tagged alerts into your Discord channel — with a link to the FDA's own notice. $9.99/server/month.</p>
+      <a class="add" href="/regping/fda/"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4.4A18 18 0 0 0 15.5 3l-.3.5a16 16 0 0 1 4 .9C16.8 3.1 13.7 3 12 3s-4.8.1-7.2 1.4a16 16 0 0 1 4-.9L8.5 3A18 18 0 0 0 4 4.4 19 19 0 0 0 1 17a18 18 0 0 0 5.4 2.7l.6-1a12 12 0 0 1-2-1l.5-.3a13 13 0 0 0 11 0l.5.3a12 12 0 0 1-2 1l.6 1A18 18 0 0 0 23 17 19 19 0 0 0 20 4.4ZM9 14.5c-.7 0-1.3-.7-1.3-1.5S8.3 11.5 9 11.5s1.3.7 1.3 1.5S9.7 14.5 9 14.5Zm6 0c-.7 0-1.3-.7-1.3-1.5s.6-1.5 1.3-1.5 1.3.7 1.3 1.5-.6 1.5-1.3 1.5Z"/></svg>RegPing FDA details</a>
+    </div>
+
+    <h2>If you build it yourself</h2>
+    <p>You don't need a bot to start. Subscribe to the FDA recalls RSS feed in a reader the team checks, and for device teams, script a periodic query against the openFDA endpoints filtered to your product codes or firm name. The two things to get right: <strong>poll often enough</strong> that "real-time" is true, and <strong>route alerts to where the team works</strong> so they're actually seen. The bot route just removes the maintenance.</p>
+
+    <h2>FAQ</h2>
+    <div class="faqs" style="padding-top:6px">
+      <details open><summary>Where does the FDA publish recalls?</summary><div class="a">On its Recalls, Market Withdrawals &amp; Safety Alerts page (with an RSS feed), with structured data available through the openFDA enforcement APIs for drug, device, and food recalls.</div></details>
+      <details><summary>What do FDA recall classes mean?</summary><div class="a">Class I is the most serious (reasonable probability of serious harm or death), Class II involves temporary or reversible harm, and Class III is unlikely to cause harm. The FDA assigns the class.</div></details>
+      <details><summary>How do I get notified in real time?</summary><div class="a">Subscribe to the FDA recalls RSS feed or poll the openFDA APIs and route new items to your team's channel. RegPing FDA does this automatically and posts to Discord.</div></details>
+    </div>
+  </article>
+
+  <section class="siblings">
+    <h2>Related</h2>
+    <div class="sib-grid">
+      <a class="sib" href="/regping/fda/"><span class="k">Product · $9.99</span><h3>RegPing FDA</h3><p>Real-time FDA recall, 510(k) &amp; adverse-event alerts.</p></a>
+      <a class="sib" href="/regping/guides/regulatory-alerts-in-discord/"><span class="k">Guide</span><h3>Regulatory alerts in Discord</h3><p>Why teams put real-time alerts where they work.</p></a>
+      <a class="sib" href="/regping/guides/"><span class="k">Guides</span><h3>All RegPing guides</h3><p>Regulatory monitoring how-tos by domain.</p></a>
+    </div>
+  </section>
+
+  <footer>
+    <p class="legal">This guide is general information, not legal advice. Always read the FDA's primary notice and consult counsel before acting. RegPing links each alert to the source.</p>
+    <nav>
+      <a href="/regping/guides/">All guides</a>
+      <a href="/regping/fda/">RegPing FDA</a>
+      <a href="/regping/">All bots</a>
+      <a href="/">Andromeda Kinship ↗</a>
+    </nav>
+  </footer>
+
+</div>
+</body>
+</html>
