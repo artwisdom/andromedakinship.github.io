@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RegPing — Regulatory alerts, delivered to your Discord</title>
+<meta name="description" content="RegPing is a suite of Discord bots that monitor public regulatory feeds — FDA, financial regulators, state cannabis, and AI/privacy law — and post plain-language alerts straight into your team's channel.">
+<link rel="canonical" href="https://andromedakinship.com/regping/">
+<meta name="theme-color" content="#04050a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="RegPing — Regulatory alerts in your Discord">
+<meta property="og:description" content="Four focused bots watch the regulators so your compliance team doesn't have to. Public feeds → plain-language alerts → your channel.">
+<meta property="og:url" content="https://andromedakinship.com/regping/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" href="/assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04050a;--bg2:#070912;--ink:#f4f6fb;--ink-dim:rgba(244,246,251,.58);--ink-faint:rgba(244,246,251,.34);
+  --violet:#8b7cff;--cyan:#5ee6ff;--magenta:#ff5ca8;--gold:#f5c66b;
+  --line:rgba(160,170,255,.10);--line-bright:rgba(160,170,255,.30);--glass:rgba(10,12,24,.55);
+  --grad:linear-gradient(120deg,var(--violet),var(--cyan));
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(1200px 600px at 80% -10%,rgba(94,230,255,.07),transparent 60%),radial-gradient(900px 500px at 0% 10%,rgba(139,124,255,.07),transparent 55%)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+.mono{font-family:'IBM Plex Mono',monospace;letter-spacing:.22em;text-transform:uppercase;font-size:.62rem;color:var(--ink-faint)}
+
+header.hdr{display:flex;align-items:center;justify-content:space-between;padding:22px 0;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:.95rem}
+.brand img{width:26px;height:26px;border-radius:7px}
+.hdr a.back{font-size:.82rem;color:var(--ink-dim);transition:color .3s}
+.hdr a.back:hover{color:var(--cyan)}
+
+.hero{padding:74px 0 40px;text-align:center}
+.hero .kick{display:inline-block;margin-bottom:18px}
+.hero h1{font-size:clamp(2.4rem,6vw,4rem);font-weight:700;line-height:1.05;letter-spacing:-.02em}
+.hero h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero p.sub{max-width:620px;margin:22px auto 0;font-size:1.08rem;color:var(--ink-dim)}
+.disc{display:inline-flex;align-items:center;gap:9px;margin-top:26px;padding:8px 16px;border:1px solid var(--line-bright);border-radius:100px;font-size:.78rem;color:var(--ink-dim)}
+.disc b{color:var(--gold);font-weight:500}
+
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;padding:30px 0 10px}
+@media(max-width:680px){.grid{grid-template-columns:1fr}}
+.card{border:1px solid var(--line);border-radius:18px;background:var(--glass);padding:26px 26px 24px;display:flex;flex-direction:column;transition:border-color .3s,transform .3s}
+.card:hover{border-color:var(--line-bright);transform:translateY(-3px)}
+.card .top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.card h3{font-size:1.22rem;font-weight:600}
+.card .price{font-family:'IBM Plex Mono',monospace;font-size:.82rem;color:var(--cyan);white-space:nowrap}
+.card .price span{color:var(--ink-faint)}
+.card .tag{margin-top:8px;font-size:.96rem;color:var(--ink);font-weight:500}
+.card .mon{margin-top:12px;font-size:.86rem;color:var(--ink-dim);flex:1}
+.card .mon b{color:var(--ink-dim);font-weight:600;display:block;font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:5px}
+.card .add{margin-top:20px;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:12px 18px;border-radius:11px;
+  background:var(--grad);color:#05060c;font-weight:600;font-size:.92rem;transition:filter .3s,transform .2s}
+.card .add:hover{filter:brightness(1.1)}
+.card .add svg{width:18px;height:18px}
+
+.how{padding:54px 0 20px}
+.how h2{text-align:center;font-size:1.7rem;font-weight:600;margin-bottom:8px}
+.how p.lead{text-align:center;color:var(--ink-dim);max-width:560px;margin:0 auto 34px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:680px){.steps{grid-template-columns:1fr 1fr}}
+.step{border:1px solid var(--line);border-radius:14px;padding:20px 18px;background:rgba(7,9,18,.4)}
+.step .n{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--cyan);letter-spacing:.2em}
+.step h4{margin:10px 0 6px;font-size:.98rem;font-weight:600}
+.step p{font-size:.84rem;color:var(--ink-dim)}
+
+footer{margin-top:64px;border-top:1px solid var(--line);padding:30px 0 50px}
+footer .legal{font-size:.8rem;color:var(--ink-faint);max-width:680px;margin-bottom:16px}
+footer nav{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:.82rem;color:var(--ink-dim)}
+footer nav a{transition:color .3s}footer nav a:hover{color:var(--cyan)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hdr">
+    <a class="brand" href="/"><img src="/assets/icon.png" alt="">Andromeda Kinship</a>
+    <a class="back" href="/">← Back to studio</a>
+  </header>
+
+  <section class="hero">
+    <span class="kick mono">Regulatory awareness · for Discord</span>
+    <h1>The regulators move.<br><span class="g">RegPing tells your team.</span></h1>
+    <p class="sub">Four focused bots watch public regulatory feeds around the clock and post filtered, plain-language alerts straight into your compliance team's Discord channel — so nobody refreshes agency websites all morning.</p>
+    <div class="disc"><b>Note:</b> RegPing surfaces &amp; links public regulator notices. It is not legal advice.</div>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <div class="top"><h3>RegPing FDA</h3><span class="price">$9.99<span>/server/mo</span></span></div>
+      <p class="tag">Never miss an FDA recall, clearance, or adverse-event report.</p>
+      <p class="mon"><b>Monitors</b>FDA recalls (RSS) plus the openFDA device-recall, 510(k) clearance, and adverse-event (MAUDE) APIs.</p>
+      <a class="add" href="https://discord.com/oauth2/authorize?client_id=1507559918608191528" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4.4A18 18 0 0 0 15.5 3l-.3.5a16 16 0 0 1 4 .9C16.8 3.1 13.7 3 12 3s-4.8.1-7.2 1.4a16 16 0 0 1 4-.9L8.5 3A18 18 0 0 0 4 4.4 19 19 0 0 0 1 17a18 18 0 0 0 5.4 2.7l.6-1a12 12 0 0 1-2-1l.5-.3a13 13 0 0 0 11 0l.5.3a12 12 0 0 1-2 1l.6 1A18 18 0 0 0 23 17 19 19 0 0 0 20 4.4ZM9 14.5c-.7 0-1.3-.7-1.3-1.5S8.3 11.5 9 11.5s1.3.7 1.3 1.5S9.7 14.5 9 14.5Zm6 0c-.7 0-1.3-.7-1.3-1.5s.6-1.5 1.3-1.5 1.3.7 1.3 1.5-.6 1.5-1.3 1.5Z"/></svg>Add to Discord</a>
+    </div>
+    <div class="card">
+      <div class="top"><h3>RegPing Cannabis</h3><span class="price">$14.99<span>/server/mo</span></span></div>
+      <p class="tag">Track state cannabis regulators across your markets, in real time.</p>
+      <p class="mon"><b>Monitors</b>Seven US state cannabis regulators — centralized into one channel as rules change state by state.</p>
+      <a class="add" href="https://discord.com/oauth2/authorize?client_id=1507566034360598558" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4.4A18 18 0 0 0 15.5 3l-.3.5a16 16 0 0 1 4 .9C16.8 3.1 13.7 3 12 3s-4.8.1-7.2 1.4a16 16 0 0 1 4-.9L8.5 3A18 18 0 0 0 4 4.4 19 19 0 0 0 1 17a18 18 0 0 0 5.4 2.7l.6-1a12 12 0 0 1-2-1l.5-.3a13 13 0 0 0 11 0l.5.3a12 12 0 0 1-2 1l.6 1A18 18 0 0 0 23 17 19 19 0 0 0 20 4.4ZM9 14.5c-.7 0-1.3-.7-1.3-1.5S8.3 11.5 9 11.5s1.3.7 1.3 1.5S9.7 14.5 9 14.5Zm6 0c-.7 0-1.3-.7-1.3-1.5s.6-1.5 1.3-1.5 1.3.7 1.3 1.5-.6 1.5-1.3 1.5Z"/></svg>Add to Discord</a>
+    </div>
+    <div class="card">
+      <div class="top"><h3>RegPing Financial</h3><span class="price">$19.99<span>/server/mo</span></span></div>
+      <p class="tag">Real-time alerts from seven US financial regulators, in your channel.</p>
+      <p class="mon"><b>Monitors</b>SEC, FINRA, OCC, FDIC, NYDFS, FinCEN, and the FTC (filtered to financial &amp; fintech matters).</p>
+      <a class="add" href="https://discord.com/oauth2/authorize?client_id=1507565330333958224" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4.4A18 18 0 0 0 15.5 3l-.3.5a16 16 0 0 1 4 .9C16.8 3.1 13.7 3 12 3s-4.8.1-7.2 1.4a16 16 0 0 1 4-.9L8.5 3A18 18 0 0 0 4 4.4 19 19 0 0 0 1 17a18 18 0 0 0 5.4 2.7l.6-1a12 12 0 0 1-2-1l.5-.3a13 13 0 0 0 11 0l.5.3a12 12 0 0 1-2 1l.6 1A18 18 0 0 0 23 17 19 19 0 0 0 20 4.4ZM9 14.5c-.7 0-1.3-.7-1.3-1.5S8.3 11.5 9 11.5s1.3.7 1.3 1.5S9.7 14.5 9 14.5Zm6 0c-.7 0-1.3-.7-1.3-1.5s.6-1.5 1.3-1.5 1.3.7 1.3 1.5-.6 1.5-1.3 1.5Z"/></svg>Add to Discord</a>
+    </div>
+    <div class="card">
+      <div class="top"><h3>RegPing AI &amp; Privacy</h3><span class="price">$19.99<span>/server/mo</span></span></div>
+      <p class="tag">Stay aware of US and EU privacy and AI regulatory moves.</p>
+      <p class="mon"><b>Monitors</b>The CPPA, California AG, the EDPB, plus multi-state AG actions and EU AI Act developments.</p>
+      <a class="add" href="https://discord.com/oauth2/authorize?client_id=1507568223732764672" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4.4A18 18 0 0 0 15.5 3l-.3.5a16 16 0 0 1 4 .9C16.8 3.1 13.7 3 12 3s-4.8.1-7.2 1.4a16 16 0 0 1 4-.9L8.5 3A18 18 0 0 0 4 4.4 19 19 0 0 0 1 17a18 18 0 0 0 5.4 2.7l.6-1a12 12 0 0 1-2-1l.5-.3a13 13 0 0 0 11 0l.5.3a12 12 0 0 1-2 1l.6 1A18 18 0 0 0 23 17 19 19 0 0 0 20 4.4ZM9 14.5c-.7 0-1.3-.7-1.3-1.5S8.3 11.5 9 11.5s1.3.7 1.3 1.5S9.7 14.5 9 14.5Zm6 0c-.7 0-1.3-.7-1.3-1.5s.6-1.5 1.3-1.5 1.3.7 1.3 1.5-.6 1.5-1.3 1.5Z"/></svg>Add to Discord</a>
+    </div>
+  </section>
+
+  <section class="how">
+    <h2>How it works</h2>
+    <p class="lead">One shared engine, four verticals. Add a bot, pick a channel, set your filters — and let it run.</p>
+    <div class="steps">
+      <div class="step"><span class="n">01</span><h4>Add the bot</h4><p>Install your vertical to your server and point it at a channel — say <code>#regulatory-alerts</code>.</p></div>
+      <div class="step"><span class="n">02</span><h4>Set filters</h4><p>Use <code>/filter</code> to scope by agency, state, topic, and minimum severity. Your team, your noise floor.</p></div>
+      <div class="step"><span class="n">03</span><h4>It watches</h4><p>Every 30 minutes it checks the official sources, de-duplicates, and summarizes new actions in plain language.</p></div>
+      <div class="step"><span class="n">04</span><h4>You get pinged</h4><p>A clean embed lands in your channel — headline, synopsis, severity, and a link to the regulator's own notice.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <p class="legal">RegPing republishes facts from public regulators on a quote-and-link basis, and every alert links to the primary source. RegPing is a monitoring and awareness service — <b>not legal advice</b>, and not a substitute for counsel or an enterprise compliance platform. Billing is per Discord server and covers your whole team.</p>
+    <nav>
+      <a href="/regping/privacy.html">Privacy</a>
+      <a href="/regping/terms.html">Terms</a>
+      <a href="mailto:michael@complianceghost.com">Contact</a>
+      <a href="/">Andromeda Kinship ↗</a>
+    </nav>
+  </footer>
+
+</div>
+</body>
+</html>
