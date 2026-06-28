@@ -156,12 +156,15 @@ h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.1rem,5.6vw,3.9rem);f
 .fcard h3{font-family:'Space Grotesk',sans-serif;font-size:1.45rem;font-weight:500;letter-spacing:-.015em;margin:16px 0 4px}
 .fsub{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;background:linear-gradient(120deg,#8b7cff,#5ee6ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;display:inline-block}
 .fcard p{font-size:.92rem;line-height:1.75;color:var(--ink-dim);margin-top:16px}
-.orbit{margin-top:54px;padding:24px 28px;border:1px solid var(--line);border-radius:16px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;background:rgba(7,9,18,.35)}
-.orbit b{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--ink-faint);font-weight:400;flex:none}
-.orbit span{font-size:.85rem;color:var(--ink-dim)}
-.orbit span em{font-style:normal;color:var(--ink);font-weight:500}
+.orbit{margin-top:54px;padding:26px 30px;border:1px solid var(--line);border-radius:16px;background:rgba(7,9,18,.35)}
+.orbit b{display:block;font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--ink-faint);font-weight:400;margin-bottom:16px}
+.orbit ul{list-style:none;margin:0;padding:0;display:grid;gap:11px}
+.orbit li{font-size:.85rem;line-height:1.55;color:var(--ink-dim)}
+.orbit li em{font-style:normal;color:var(--ink);font-weight:500}
 .orbit a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line-bright);padding-bottom:1px;transition:color .3s,border-color .3s}
 .orbit a:hover{color:var(--cyan);border-color:var(--cyan)}
+.orbit .hire{margin-top:5px;padding-top:14px;border-top:1px solid var(--line)}
+.orbit .hire em{color:var(--cyan)}
 .flink{display:inline-block;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);opacity:.75;text-decoration:none;transition:opacity .3s}
 .flink:hover{opacity:1}
 
@@ -307,8 +310,15 @@ footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:44px
     </div>
     <div class="orbit rv">
       <b>ALSO IN ORBIT</b>
-      <span><em><a href="https://benchcalcs.com" target="_blank" rel="noopener">BenchCalcs</a></em> — a network of single-purpose engineering calculators</span>
-      <span><em>Dealer Ops Daily</em> — an automated intelligence brief for dealership operators</span>
+      <ul>
+        <li><em><a href="https://carsalestrackerpro.com" target="_blank" rel="noopener">carsalestrackerpro.com</a></em> — the free web tracker, commission calculator &amp; pay-plan guides for car salespeople</li>
+        <li><em><a href="https://leaseworth.app" target="_blank" rel="noopener">LeaseWorth</a></em> — a true effective-monthly-cost car lease calculator</li>
+        <li><em><a href="https://benchcalcs.com" target="_blank" rel="noopener">BenchCalcs</a></em> — a network of single-purpose engineering calculators</li>
+        <li><em><a href="https://chromewebstore.google.com/detail/plfdkafobcdpmgomcfdlhjmdedndmgip" target="_blank" rel="noopener">Table to Sheets</a></em> — a Chrome extension that exports any web table to CSV or Google Sheets</li>
+        <li><em><a href="https://www.etsy.com/shop/AndromedaKinship" target="_blank" rel="noopener">Etsy shop</a></em> — printable planners &amp; digital templates</li>
+        <li><em>Dealer Ops Daily</em> — an automated intelligence brief for dealership operators</li>
+        <li class="hire"><em>Available for hire</em> — Andromeda Kinship designs, builds &amp; manages websites for clients. <a href="mailto:michael@andromedakinship.com?subject=Website%20project%20inquiry">Start a project →</a></li>
+      </ul>
     </div>
   </section>
 
