@@ -1,5 +1,5 @@
 :root{
-  --bg:#04050a;--bg2:#070912;--ink:#f4f6fb;--ink-dim:rgba(244,246,251,.58);--ink-faint:rgba(244,246,251,.34);
+  --bg:#04050a;--bg2:#070912;--ink:#f4f6fb;--ink-dim:rgba(244,246,251,.58);--ink-faint:rgba(244,246,251,.52);
   --violet:#cc785c;--cyan:#e0a07a;--magenta:#ff5ca8;--gold:#f5c66b;
   --line:rgba(204,120,92,.12);--line-bright:rgba(204,120,92,.34);--glass:rgba(10,12,24,.55);
   --grad:linear-gradient(120deg,var(--violet),var(--cyan));
