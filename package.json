@@ -9,5 +9,6 @@
     "check": "node scripts/build.mjs --check && node --test tests/*.test.mjs",
     "refresh:apps": "node scripts/refresh-apps.mjs"
   },
-  "engines": { "node": ">=20" }
+  "engines": { "node": ">=20" },
+  "devDependencies": { "jsqr": "1.4.0" }
 }

@@ -14,7 +14,7 @@ Confirm the remote, branch, clean/dirty state, and current GitHub Pages source b
 
 ## Edit and preview
 
-Requires Node.js 20 or newer. No package installation, build service, paid font service, or animation subscription is required.
+Requires Node.js 20 or newer. Building and previewing need no package installation. `npm ci --ignore-scripts` installs the one test-only dependency for independent QR decoding. No build service, paid font service, animation subscription, or QR subscription is required.
 
 ```sh
 npm run build
@@ -30,6 +30,7 @@ Edit these source files:
 - `assets/site.js`: navigation, search, sorting, and motion preferences
 - `assets/galaxy.js`: original WebGL galaxy and scroll-driven camera
 - `assets/catalog.js`: shared normalization, sorting, filtering, and safe HTML rendering
+- `assets/qr.js`: locally generated App Store QR codes and accessible card-flip controls
 - `data/projects.json`: verified public website directory, including explicit early-stage labels
 - `data/apps.json`: dated U.S. App Store snapshot and curated app descriptions
 
@@ -37,7 +38,7 @@ Edit these source files:
 
 ## Brand and content rules
 
-The owner-supplied Fiverr logo is used unchanged in `assets/brand/andromeda-kinship.svg`. Its guide specifies **Libre Baskerville 400**, black, and white. The site uses that typeface with Inter for reading text. Fonts are self-hosted; their OFL licenses are in `assets/fonts/`. The supplied icon files are used for the site's browser and home-screen icons.
+The owner-supplied Fiverr logo is used unchanged in `assets/brand/andromeda-kinship.svg`. Its guide specifies **Libre Baskerville 400**, black, and white. The site uses that typeface with Inter for reading text. Fonts are self-hosted; their OFL licenses are in `assets/fonts/`. `favicon.svg` reuses the exact supplied symbol paths without the lettering, framed on white for small sizes. The PNG (32px), ICO (16/32/48px), and Apple touch icon (180px) are raster exports of that SVG. Icon links are versioned to refresh cached older designs after a release.
 
 Andromeda Kinship is the independent studio/umbrella. **Bay State Sites** is the separate website-design, hosting, and care brand. Website-service inquiries should point to `https://baystatesites.com/`.
 
@@ -57,6 +58,10 @@ npm test
 
 Review new app names and descriptions before publishing. The refresh refuses to silently remove saved apps. The rendered collection can be sorted by popularity, original release date, or average rating.
 
+Each app card has a **Show QR code** button, a **Back to app** button, and direct App Store links on both sides. QR images are generated only when requested, encode the card's exact official Apple URL, and use black modules on white with a four-module clear border. No third-party QR endpoint, expiring short link, or tracking redirect is involved. New apps returned by the existing Apple refresh automatically receive the same controls. Search and sorting reset cards to their fronts.
+
+The encoder is [Project Nayuki's QR Code generator v1.8.0](https://github.com/nayuki/QR-Code-generator/releases/tag/v1.8.0), vendored in `assets/vendor/qrcodegen.js` with its MIT license intact; adaptations are an ES-module export and removal of trailing whitespace. It is included in the site's versioned bundle, so no runtime CDN dependency is added. The pinned, development-only [jsQR decoder](https://github.com/cozmo/jsQR) independently scans SVG-derived pixels for every app during tests; it is never included in the browser bundle.
+
 ## Accessibility and resilient motion
 
 - Native scrolling; no scroll hijacking, autoplay sound, tracking pixels, or sign-up overlay.
@@ -64,6 +69,7 @@ Review new app names and descriptions before publishing. The refresh refuses to 
 - Reduced-motion preferences start with a still scene. Explicit pause/resume controls remember only this device-local preference.
 - WebGL failure leaves the galaxy photograph and all page content usable. JavaScript failure leaves the complete static catalogs and navigation usable.
 - Search/filter changes announce concise result counts. The mobile menu supports keyboard navigation, Escape, focus containment, and an inert background.
+- Card flips use real buttons, transfer focus to the visible side, make the hidden side inert, and return to the front on Escape. Reduced-motion and the site's pause setting remove the flip transition. Without JavaScript, all normal App Store links remain usable and QR controls stay hidden.
 
 The existing M31 photograph is by Adam Evans, licensed CC BY 2.0, with visible attribution. It remains the static fallback and existing social-preview image. The animated scene is an artistic interpretation, not an astronomical simulation.
 
@@ -73,6 +79,8 @@ The existing M31 photograph is by Adam Evans, licensed CC BY 2.0, with visible a
 npm run check
 git diff --check
 ```
+
+Run `npm ci --ignore-scripts` once before tests in a fresh checkout. The checks include independent QR decoding for all 25 saved apps, focus/inert-state behavior, safe destinations, and icon format/content verification.
 
 For local failure-mode checks only, start the preview with `ANDROMEDA_QA=1 npm run dev`. The query modes `?qa=no-js`, `?qa=no-webgl`, `?qa=offline-apps`, and `?qa=reduced-motion` simulate failures/preferences in the local preview. They are not generated into the public homepage.
 

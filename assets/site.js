@@ -1,5 +1,6 @@
 import { APPLE_LOOKUP, normalizeApps, sortApps, filterRecords, renderApp, renderProject } from './catalog.js';
 import { createGalaxy } from './galaxy.js';
+import { enableAppFlips } from './qr.js';
 
 document.documentElement.classList.add('js');
 const $ = selector => document.querySelector(selector);
@@ -41,6 +42,7 @@ function updateApps() {
   $('#ranking-note').textContent = order === 'newest' ? 'Ordered by original U.S. App Store release date, newest first.' : order === 'rating' ? 'Ordered by average U.S. App Store rating. Unrated apps appear last.' : 'Popularity = number of U.S. App Store ratings. Ties show newer releases first.';
 }
 for (const [selector, event] of [['#app-sort', 'change'], ['#app-search', 'input']]) $(selector).addEventListener(event, () => { appInteracted = true; updateApps(); });
+enableAppFlips($('#app-grid'), () => { appInteracted = true; });
 
 // Best-effort refresh. A complete, indexable snapshot is already in the HTML.
 // Never remove saved apps because of a partial/region-specific Apple response.

@@ -69,15 +69,28 @@ export function renderProject(project, index) {
 export function renderApp(app, index) {
   const url = safeURL(app.url, ['apps.apple.com']);
   const icon = safeURL(app.icon, ['mzstatic.com']);
-  if (!url || !icon) throw new Error(`Invalid app URL: ${app.id}`);
+  if (!url || !icon || !Number.isSafeInteger(app.id) || app.id < 1) throw new Error(`Invalid app URL or ID: ${app.id}`);
   const rating = app.count > 0
     ? `<span class="app-rating"><span aria-hidden="true">★</span> ${app.rating.toFixed(1)} <span class="sr-only">out of 5,</span><span class="rating-count">${app.count.toLocaleString('en-US')} ${app.count === 1 ? 'rating' : 'ratings'}</span></span>`
     : '<span class="app-unrated">Not yet rated</span>';
   return `<article class="app-card" data-app-id="${app.id}">
-    <a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">
+    <div class="app-card-inner">
+    <div class="app-face app-front" id="app-front-${app.id}">
+    <a class="app-primary-link" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">
       <div class="app-top"><img src="${escapeHTML(icon)}" width="56" height="56" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"><span class="app-number" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span>${arrow}</div>
       <h3>${escapeHTML(app.name)}</h3><span class="app-genre">${escapeHTML(app.genre)}</span><p>${escapeHTML(app.description)}</p>
       <div class="app-bottom">${rating}<span class="sr-only"> · View on the App Store (opens in a new tab)</span></div>
     </a>
+    <button class="app-flip-button" type="button" data-show-qr aria-label="Show QR code for ${escapeHTML(app.name)}" aria-controls="app-qr-${app.id}" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h2v2h-2zM19 19h2v2h-2z" stroke="currentColor" stroke-width="1.5"/><path d="M21 14v3M14 21h3M12 3v3M3 12h3" stroke="currentColor" stroke-width="1.5"/></svg>Show QR code<span aria-hidden="true">↻</span></button>
+    </div>
+    <div class="app-face app-back" id="app-qr-${app.id}" aria-hidden="true" inert>
+      <span class="app-qr-eyebrow">From your screen to your phone</span>
+      <p class="app-qr-name">${escapeHTML(app.name)}</p>
+      <div class="app-qr-image" data-qr-image></div>
+      <p class="app-qr-help">Scan with your phone camera.</p>
+      <a class="app-store-link" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">Open App Store ${arrow}<span class="sr-only"> for ${escapeHTML(app.name)} (opens in a new tab)</span></a>
+      <button class="app-return-button" type="button" data-hide-qr aria-label="Back to app details for ${escapeHTML(app.name)}"><span aria-hidden="true">↶</span>Back to app</button>
+    </div>
+    </div>
   </article>`;
 }

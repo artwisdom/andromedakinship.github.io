@@ -34,3 +34,42 @@ body.motion-paused{scroll-behavior:auto}body.motion-paused .feature:hover,body.m
 @media(max-width:720px){html:not(.js) .site-header{position:absolute;height:auto;flex-wrap:wrap;gap:0;padding-bottom:12px;background:#05080f}html:not(.js) .site-header nav{width:100%;justify-content:space-between;gap:0 14px}html:not(.js) .site-header nav a{min-height:44px;font-size:12px}html:not(.js) .hero-coordinates{top:180px}html:not(.js) .hero{padding-top:250px}}
 @media(max-width:400px){.site-header{gap:8px}.brand{width:178px}.brand img{width:234px;height:114px;left:-26px;top:-15px}.footer-wordmark{font-size:clamp(34px,11.4vw,48px)}.hero h1{font-size:clamp(40px,12vw,46px)}}
 .hero-bottom>p{margin-right:140px}@media(max-width:720px){.hero-bottom>p{margin-right:42px}}
+
+/* Two useful sides of every app. Only the visible face can receive focus. */
+.app-card { perspective: 1200px; background: transparent; border: 0; }
+.app-card:hover { background: transparent; }
+.app-card-inner { display: grid; height: 100%; transform-style: preserve-3d; transition: transform .65s cubic-bezier(.22,.68,.12,1); }
+.app-card.is-flipped .app-card-inner { transform: rotateY(180deg); }
+.app-face { grid-area: 1 / 1; min-width: 0; border: 1px solid #2c394b; border-radius: 5px; background: linear-gradient(140deg,#111b2a,#0c131e); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.app-card:hover .app-face { border-color: #8094b1; }
+.app-front { display: flex; flex-direction: column; }
+.app-primary-link { flex: 1; display: flex; flex-direction: column; padding: 23px 20px 16px; text-decoration: none; border-radius: 5px 5px 0 0; }
+.app-primary-link:focus-visible { outline-offset: -5px; }
+.app-flip-button, .app-return-button { min-height: 44px; align-items: center; justify-content: center; gap: 9px; color: #c7d9ed; background: transparent; border: 0; font: inherit; font-size: 12px; cursor: pointer; }
+.app-flip-button { display: none; margin: 0 20px 12px; border-top: 1px solid #2c394b; }
+.js .app-flip-button { display: flex; }
+.app-flip-button svg { width: 19px; height: 19px; }
+.app-flip-button>span { margin-left: auto; font-size: 20px; }
+.app-flip-button:hover, .app-return-button:hover { color: #fff; background: #1c2c42; }
+.app-back { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 22px 18px 12px; transform: rotateY(180deg); text-align: center; background: radial-gradient(ellipse at 50% 0,#20344c,transparent 70%),#0c131e; }
+.js .app-back { display: flex; }
+.app-qr-eyebrow { color: #b5c4d7; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+.app-card .app-qr-name { color: #f4f2ec; font-size: 14px; font-weight: 500; line-height: 1.5; margin: 10px 0 14px; overflow-wrap: anywhere; }
+.app-qr-image { width: 184px; max-width: 100%; aspect-ratio: 1; padding: 0; background: #fff; color-scheme: light; box-shadow: 0 0 35px #74baff15; }
+.app-qr-image svg { display: block; width: 100%; height: auto; }
+.app-card .app-qr-help { margin: 12px 0 4px; color: #b5c4d7; font-size: 11px; }
+.app-store-link { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; color: #f4f2ec; font-size: 12px; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.app-store-link svg { width: 13px; height: 13px; }
+.app-return-button { display: flex; width: 100%; margin-top: 5px; border-top: 1px solid #34455b; }
+.app-return-button span { font-size: 20px; }
+.app-face[inert] { pointer-events: none; }
+@media (max-width: 440px) {
+  .app-primary-link { padding: 24px 24px 16px; }
+  .app-flip-button { margin-right: 24px; margin-left: 24px; }
+}
+@media (prefers-reduced-motion: reduce) { .app-card-inner { transition: none; } }
+.motion-paused .app-card-inner { transition: none; }
+@media (forced-colors: active) {
+  .app-face { border: 1px solid ButtonText; }
+  .app-qr-image { forced-color-adjust: none; }
+}
