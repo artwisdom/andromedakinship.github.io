@@ -1,0 +1,255 @@
+{
+  "verifiedAt": "2026-09-04",
+  "projects": [
+    {
+      "id": "benchcalcs",
+      "name": "BenchCalcs",
+      "url": "https://benchcalcs.com/",
+      "description": "Everyday calculators for construction, home projects, energy, and vehicles—with transparent math and practical explanations.",
+      "category": "Tools",
+      "monogram": "BC",
+      "status": "Live",
+      "featured": true
+    },
+    {
+      "id": "govwait",
+      "name": "GovWait",
+      "url": "https://govwait.com/",
+      "description": "A clearer view of government waiting times. Follow official visa, permit, and processing-time updates with dated history.",
+      "category": "Data",
+      "monogram": "GW",
+      "status": "Live",
+      "featured": true
+    },
+    {
+      "id": "carsales",
+      "name": "CarSales Tracker Pro",
+      "url": "https://carsalestrackerpro.com/",
+      "description": "Commission calculators, pay-plan guides, and a companion to the deal-tracking app built for automotive salespeople.",
+      "category": "Work",
+      "monogram": "CS",
+      "status": "Live",
+      "featured": true
+    },
+    {
+      "id": "leaseworth",
+      "name": "LeaseWorth",
+      "url": "https://leaseworth.app/",
+      "description": "Understand the effective monthly cost of a vehicle lease and compare offers beyond the advertised payment.",
+      "category": "Tools",
+      "monogram": "LW",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "rulegrid",
+      "name": "RuleGrid",
+      "url": "https://rulegrid.dev/",
+      "description": "Source-linked short-term rental rules, licensing requirements, and restrictions for property research and software.",
+      "category": "Data",
+      "monogram": "RG",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "statuterates",
+      "name": "StatuteRates",
+      "url": "https://statuterates.com/",
+      "description": "Statutory interest-rate references and calculators, with source links and effective dates for checking the details.",
+      "category": "Data",
+      "monogram": "SR",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "renewmark",
+      "name": "RenewMark",
+      "url": "https://renewmark.app/",
+      "description": "U.S. trademark renewal monitoring and deadline alerts to help owners keep important dates in view.",
+      "category": "Work",
+      "monogram": "RM",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "funderfit",
+      "name": "FunderFit",
+      "url": "https://funderfit.co/",
+      "description": "Grant-funder research that uses public giving records to help nonprofits build a more relevant prospect shortlist.",
+      "category": "Data",
+      "monogram": "FF",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "paybeacon",
+      "name": "PayBeacon",
+      "url": "https://travelpaybeacon.com/",
+      "description": "Travel-healthcare pay benchmarks and offer comparisons informed by public labor and healthcare data.",
+      "category": "Data",
+      "monogram": "PB",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "dwelldocket",
+      "name": "DwellDocket",
+      "url": "https://dwelldocket.com/",
+      "description": "A source-backed reference for security-deposit limits, return deadlines, and state-specific requirements.",
+      "category": "Data",
+      "monogram": "DD",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "crawlledger",
+      "name": "CrawlLedger",
+      "url": "https://crawlledger.net/",
+      "description": "An evidence trail for changing AI-crawler policies, including robots.txt, Content Signals, and llms.txt.",
+      "category": "Data",
+      "monogram": "CL",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "provenday",
+      "name": "ProvenDay",
+      "url": "https://provenday.com/",
+      "description": "Business-day and settlement-date tools that account for bank holidays and market closures, with source references.",
+      "category": "Tools",
+      "monogram": "PD",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "hitchmargin",
+      "name": "HitchMargin",
+      "url": "https://hitchmargin.com/",
+      "description": "A towing and payload worksheet that uses your verified vehicle ratings to show which capacity limits the setup.",
+      "category": "Tools",
+      "monogram": "HM",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "fountainpenregister",
+      "name": "Fountain Pen Register",
+      "url": "https://fountainpenregister.com/",
+      "description": "A collector's reference for identifying vintage and limited-edition fountain pens through documented model history.",
+      "category": "Creative",
+      "monogram": "FP",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "dubetools",
+      "name": "DubeTools",
+      "url": "https://dubetools.com/",
+      "description": "Practical browser tools and guides, including Table to Sheets for moving web tables into CSV and Google Sheets.",
+      "category": "Tools",
+      "monogram": "DT",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "complianceghost",
+      "name": "Compliance Ghost",
+      "url": "https://complianceghost.com/",
+      "description": "Compliance documentation resources for Texas med spas, dental practices, tattoo studios, and estheticians.",
+      "category": "Work",
+      "monogram": "CG",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "regping",
+      "name": "RegPing",
+      "url": "https://andromedakinship.com/regping/",
+      "description": "Regulatory-monitoring tools that bring FDA, finance, cannabis, and AI/privacy updates into Discord.",
+      "category": "Work",
+      "monogram": "RP",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "kitchenledger",
+      "name": "Kitchen Ledger",
+      "url": "https://artwisdom.github.io/kitchenledger-web/",
+      "description": "The home of the cottage-baker app: track sales, understand revenue caps, and keep a small food business organized.",
+      "category": "Work",
+      "monogram": "KL",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "scrapmetal",
+      "name": "ScrapMetal Intel",
+      "url": "https://artwisdom.github.io/scrapmetalintel-web/",
+      "description": "The companion website for scrap-metal pricing, yard-rate tracking, and the ScrapMetal Intel app.",
+      "category": "Work",
+      "monogram": "SM",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "dealerops",
+      "name": "Dealer Ops Daily",
+      "url": "https://dealer-ops-daily.beehiiv.com/",
+      "description": "A short morning briefing for U.S. dealership operators, focused on the signals that matter to the business.",
+      "category": "Work",
+      "monogram": "DO",
+      "status": "Newsletter",
+      "featured": false
+    },
+    {
+      "id": "baystatesites",
+      "name": "Bay State Sites",
+      "url": "https://baystatesites.com/",
+      "description": "Website design, hosting, and ongoing care for trades and local service businesses in southeastern Massachusetts.",
+      "category": "Services",
+      "monogram": "BS",
+      "status": "Live",
+      "featured": false
+    },
+    {
+      "id": "hookferry",
+      "name": "Hookferry",
+      "url": "https://hookferry.com/",
+      "description": "Small, focused automation bridges. Launch preparations begin with RSS-to-Telegram summaries.",
+      "category": "Tools",
+      "monogram": "HF",
+      "status": "Prelaunch",
+      "featured": false
+    },
+    {
+      "id": "permitarchive",
+      "name": "Permit Archive",
+      "url": "https://permitarchive.com/",
+      "description": "Source guides and research on building-permit history and contractor activity. Record datasets are not yet publicly released.",
+      "category": "Data",
+      "monogram": "PA",
+      "status": "Source guides",
+      "featured": false
+    },
+    {
+      "id": "ratearchive",
+      "name": "The Rate Archive",
+      "url": "https://theratearchive.com/",
+      "description": "Research and source guides for tracking U.S. college tuition and mandatory fees over time. Dataset release is in preparation.",
+      "category": "Data",
+      "monogram": "RA",
+      "status": "Source guides",
+      "featured": false
+    },
+    {
+      "id": "dutymesh",
+      "name": "DutyMesh",
+      "url": "https://dutymesh-evidence.dube508.chatgpt.site/",
+      "description": "A public research preview of source-linked tariff evidence and import-cost guides. Transaction calculations are not yet live.",
+      "category": "Data",
+      "monogram": "DM",
+      "status": "Research preview",
+      "featured": false
+    }
+  ]
+}

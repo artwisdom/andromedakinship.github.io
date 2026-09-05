@@ -1,0 +1,13 @@
+{
+  "name": "andromeda-kinship-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node scripts/build.mjs --check && node --test tests/*.test.mjs",
+    "refresh:apps": "node scripts/refresh-apps.mjs"
+  },
+  "engines": { "node": ">=20" }
+}
