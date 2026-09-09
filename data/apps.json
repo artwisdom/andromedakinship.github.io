@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-09-04",
+  "verifiedAt": "2026-09-08",
   "country": "us",
   "developerId": 1858655640,
   "source": "https://itunes.apple.com/lookup?id=1858655640&entity=software&country=us&limit=200",
@@ -8,13 +8,13 @@
       "id": 6763932885,
       "name": "Scrap Metal Intel: Live Prices",
       "genre": "Finance",
-      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/d6/10/3d/d6103dba-a9b9-121d-141f-8de384addb1f/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/6d/33/61/6d3361f1-05fd-8030-fe52-196bbf9fb826/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg",
       "url": "https://apps.apple.com/us/app/scrap-metal-intel-live-prices/id6763932885?uo=4",
       "description": "Scrap metal prices, real yard rates, and inventory tools to help scrappers understand what their next load is worth.",
       "rating": 5,
       "count": 3,
       "released": "2026-05-11",
-      "updated": "2026-08-31"
+      "updated": "2026-09-07"
     },
     {
       "id": 6769228345,
@@ -53,16 +53,16 @@
       "updated": "2026-09-05"
     },
     {
-      "id": 6776481965,
-      "name": "Lope: Pet Walking Logger",
-      "genre": "Health & Fitness",
-      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/dc/16/79/dc1679e1-f61a-0767-faaa-0899d246b470/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg",
-      "url": "https://apps.apple.com/us/app/lope-pet-walking-logger/id6776481965?uo=4",
-      "description": "Keep a clear walking history for the dogs in your care, whether you walk professionally or share the job at home.",
-      "rating": 5,
-      "count": 1,
-      "released": "2026-06-13",
-      "updated": "2026-08-25"
+      "id": 6759974205,
+      "name": "RV Sales Tracker Pro",
+      "genre": "Business",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/8c/ab/03/8cab037e-a9d1-dda4-3119-85ba05eb0526/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg",
+      "url": "https://apps.apple.com/us/app/rv-sales-tracker-pro/id6759974205?uo=4",
+      "description": "A deal and commission tracker designed around the day-to-day work of selling recreational vehicles.",
+      "rating": 3,
+      "count": 2,
+      "released": "2026-03-05",
+      "updated": "2026-09-03"
     },
     {
       "id": 6790043505,
@@ -77,6 +77,30 @@
       "updated": "2026-09-02"
     },
     {
+      "id": 6776481965,
+      "name": "Lope: Pet Walking Logger",
+      "genre": "Health & Fitness",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/dc/16/79/dc1679e1-f61a-0767-faaa-0899d246b470/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg",
+      "url": "https://apps.apple.com/us/app/lope-pet-walking-logger/id6776481965?uo=4",
+      "description": "Keep a clear walking history for the dogs in your care, whether you walk professionally or share the job at home.",
+      "rating": 5,
+      "count": 1,
+      "released": "2026-06-13",
+      "updated": "2026-08-25"
+    },
+    {
+      "id": 6779043964,
+      "name": "Sashline: Opening Sheet",
+      "genre": "Business",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/ca/92/64/ca926452-e913-d0e2-be6d-38b2255df376/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/512x512bb.jpg",
+      "url": "https://apps.apple.com/us/app/sashline-opening-sheet/id6779043964?uo=4",
+      "description": "Capture window and door measurements, opening details, and options for a more organized quote.",
+      "rating": 0,
+      "count": 0,
+      "released": "2026-07-06",
+      "updated": "2026-07-06"
+    },
+    {
       "id": 6785304150,
       "name": "Cadence: Music Teacher",
       "genre": "Business",
@@ -87,30 +111,6 @@
       "count": 1,
       "released": "2026-07-07",
       "updated": "2026-07-07"
-    },
-    {
-      "id": 6759974205,
-      "name": "RV Sales Tracker Pro",
-      "genre": "Business",
-      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/8c/ab/03/8cab037e-a9d1-dda4-3119-85ba05eb0526/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg",
-      "url": "https://apps.apple.com/us/app/rv-sales-tracker-pro/id6759974205?uo=4",
-      "description": "A deal and commission tracker designed around the day-to-day work of selling recreational vehicles.",
-      "rating": 3,
-      "count": 2,
-      "released": "2026-03-05",
-      "updated": "2026-09-03"
-    },
-    {
-      "id": 6780881145,
-      "name": "Sqftly: Cleaning Bid Sheet",
-      "genre": "Business",
-      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/3f/d5/ad/3fd5ad8b-5264-6541-772c-559d3dca315d/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/512x512bb.jpg",
-      "url": "https://apps.apple.com/us/app/sqftly-cleaning-bid-sheet/id6780881145?uo=4",
-      "description": "Turn room measurements and cleaning requirements into organized, repeatable commercial cleaning bids.",
-      "rating": 5,
-      "count": 1,
-      "released": "2026-07-06",
-      "updated": "2026-07-06"
     },
     {
       "id": 6759101731,
@@ -137,28 +137,16 @@
       "updated": "2026-09-02"
     },
     {
-      "id": 6779043964,
-      "name": "Sashline: Opening Sheet",
+      "id": 6780881145,
+      "name": "Sqftly: Cleaning Bid Sheet",
       "genre": "Business",
-      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/ca/92/64/ca926452-e913-d0e2-be6d-38b2255df376/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/512x512bb.jpg",
-      "url": "https://apps.apple.com/us/app/sashline-opening-sheet/id6779043964?uo=4",
-      "description": "Capture window and door measurements, opening details, and options for a more organized quote.",
-      "rating": 0,
-      "count": 0,
-      "released": "2026-07-06",
-      "updated": "2026-07-06"
-    },
-    {
-      "id": 6761087030,
-      "name": "Powersports Sales Tracker Pro",
-      "genre": "Business",
-      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/e2/42/47/e24247e2-4fd2-594f-9fdd-e6b0d9dc8418/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg",
-      "url": "https://apps.apple.com/us/app/powersports-sales-tracker-pro/id6761087030?uo=4",
-      "description": "Track sales and commissions across motorcycles, ATVs, UTVs, snowmobiles, and personal watercraft.",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/2b/fa/90/2bfa9078-ea74-ea89-8316-505906396a03/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg",
+      "url": "https://apps.apple.com/us/app/sqftly-cleaning-bid-sheet/id6780881145?uo=4",
+      "description": "Turn room measurements and cleaning requirements into organized, repeatable commercial cleaning bids.",
       "rating": 5,
       "count": 1,
-      "released": "2026-03-31",
-      "updated": "2026-03-31"
+      "released": "2026-07-06",
+      "updated": "2026-09-07"
     },
     {
       "id": 6760478652,
@@ -171,6 +159,18 @@
       "count": 1,
       "released": "2026-04-01",
       "updated": "2026-04-01"
+    },
+    {
+      "id": 6761087030,
+      "name": "Powersports Sales Tracker Pro",
+      "genre": "Business",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/e2/42/47/e24247e2-4fd2-594f-9fdd-e6b0d9dc8418/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg",
+      "url": "https://apps.apple.com/us/app/powersports-sales-tracker-pro/id6761087030?uo=4",
+      "description": "Track sales and commissions across motorcycles, ATVs, UTVs, snowmobiles, and personal watercraft.",
+      "rating": 5,
+      "count": 1,
+      "released": "2026-03-31",
+      "updated": "2026-03-31"
     },
     {
       "id": 6772840772,
@@ -197,18 +197,6 @@
       "updated": "2026-07-06"
     },
     {
-      "id": 6776851535,
-      "name": "Thresh: Ag Equipment Deals",
-      "genre": "Business",
-      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/a8/92/3c/a8923c98-4db8-8cd3-cea1-302545b0a74b/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg",
-      "url": "https://apps.apple.com/us/app/thresh-ag-equipment-deals/id6776851535?uo=4",
-      "description": "A deal book for agricultural equipment sales, with room for bundled machines and incentive windows.",
-      "rating": 0,
-      "count": 0,
-      "released": "2026-09-02",
-      "updated": "2026-09-02"
-    },
-    {
       "id": 6797306127,
       "name": "StitchChart: Cross Stitch",
       "genre": "Lifestyle",
@@ -219,6 +207,18 @@
       "count": 0,
       "released": "2026-08-16",
       "updated": "2026-08-16"
+    },
+    {
+      "id": 6776851535,
+      "name": "Thresh: Ag Equipment Deals",
+      "genre": "Business",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/a8/92/3c/a8923c98-4db8-8cd3-cea1-302545b0a74b/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg",
+      "url": "https://apps.apple.com/us/app/thresh-ag-equipment-deals/id6776851535?uo=4",
+      "description": "A deal book for agricultural equipment sales, with room for bundled machines and incentive windows.",
+      "rating": 0,
+      "count": 0,
+      "released": "2026-09-02",
+      "updated": "2026-09-02"
     },
     {
       "id": 6780880159,

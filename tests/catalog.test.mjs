@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { stat } from 'node:fs/promises';
-import { escapeHTML, safeURL, normalizeApps, sortApps, filterRecords, renderApp, renderProject, DEVELOPER_ID } from '../assets/catalog.js';
+import { escapeHTML, safeURL, normalizeApps, sortApps, filterRecords, renderApp, renderProject, partitionProjects, DEVELOPER_ID } from '../assets/catalog.js';
 
 const snapshot = JSON.parse(await readFile(new URL('../data/apps.json', import.meta.url)));
 const projects = JSON.parse(await readFile(new URL('../data/projects.json', import.meta.url))).projects;
@@ -67,9 +67,16 @@ test('all 25 public apps are in the static HTML before JavaScript', () => {
   assert.equal(new Set(snapshot.apps.map(a => a.id)).size, snapshot.apps.length);
   for (const app of snapshot.apps) assert.ok(html.includes(`data-app-id="${app.id}"`));
 });
-test('all 25 verified websites are in the static HTML', () => {
-  assert.equal(projects.length, 25); assert.equal((html.match(/class="project-card"/g) || []).length, projects.length);
-  for (const project of projects) { assert.ok(html.includes(`data-project="${project.id}"`)); assert.doesNotThrow(() => renderProject(project)); }
+test('18 actual websites and four labeled previews render without inflating the website count', () => {
+  const groups = partitionProjects(projects);
+  assert.equal(groups.website.length,18); assert.equal(groups.preview.length,4);
+  assert.equal(groups['app-support'].length,2); assert.equal(groups.newsletter.length,1);
+  assert.equal((html.match(/class="project-card"/g) || []).length,22);
+  for (const project of [...groups.website,...groups.preview]) { assert.ok(html.includes(`data-project="${project.id}"`)); assert.doesNotThrow(() => renderProject(project)); }
+  for (const id of ['kitchenledger','scrapmetal','dealerops']) assert.ok(!html.includes(`data-project="${id}"`));
+  assert.match(html, /18<span>↗<\/span><\/strong><span>WEBSITES/);
+  assert.throws(() => partitionProjects([{id:'bad',kind:'unclassified'}]));
+  assert.throws(() => partitionProjects([{id:'bad',kind:'__proto__'}]));
 });
 test('saved popularity order starts with CarSales and rating counts never increase', () => {
   const ordered = sortApps(snapshot.apps); assert.equal(ordered[0].id, 6756135308);
@@ -88,6 +95,7 @@ test('prelaunch and research ventures are not represented as live products', () 
 test('correct domains and separate Bay State Sites positioning are preserved', () => {
   assert.equal(projects.find(p => p.id === 'funderfit').url, 'https://funderfit.co/');
   assert.equal(projects.find(p => p.id === 'baystatesites').url, 'https://baystatesites.com/');
+  assert.equal(projects.find(p => p.id === 'dutymesh').url, 'https://usedutymesh.com/');
   assert.doesNotMatch(html, /Andromeda Kinship (designs|builds and maintains)|Websites Built &amp; Maintained/);
   assert.match(html, /dedicated brand for website design/);
 });
@@ -131,7 +139,7 @@ test('principal text and card palettes meet the WCAG AA 4.5:1 contrast threshold
     const [r, g, b] = hex.match(/[a-f0-9]{2}/gi).map(part => parseInt(part, 16) / 255).map(channel => channel <= .04045 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4);
     return .2126 * r + .7152 * g + .0722 * b;
   };
-  for (const [foreground, background] of [['f4f2ec','05080f'], ['a6afbd','0b1019'], ['a9b6ca','111b2a'], ['365449','c7d6cf'], ['c8b6ca','17141d'], ['bbcddb','0e2030'], ['ecd3aa','111b2a']]) {
+  for (const [foreground, background] of [['f4f2ec','05080f'], ['a6afbd','0b1019'], ['a9b6ca','111b2a'], ['365449','c7d6cf'], ['c8b6ca','17141d'], ['bbcddb','0e2030'], ['ecd3aa','111b2a'], ['aebacd','0b111b'], ['b6c4d7','070c14'], ['c4dcff','070c14']]) {
     const values = [luminance(foreground), luminance(background)].sort((a, b) => b - a);
     assert.ok((values[0] + .05) / (values[1] + .05) >= 4.5, `${foreground} on ${background}`);
   }

@@ -20,7 +20,7 @@ export function normalizeApps(response, knownApps = []) {
   const known = new Map(knownApps.map(app => [app.id, app]));
   const unique = new Map();
   for (const app of response.results) {
-    if (app.wrapperType !== 'software' || Number(app.artistId) !== DEVELOPER_ID || !Number.isSafeInteger(app.trackId) || !app.trackName) continue;
+    if (app.wrapperType !== 'software' || Number(app.artistId) !== DEVELOPER_ID || !Number.isSafeInteger(app.trackId) || app.trackId < 1 || !app.trackName) continue;
     const url = safeURL(app.trackViewUrl, ['apps.apple.com']);
     const icon = safeURL(app.artworkUrl512 || app.artworkUrl100, ['mzstatic.com']);
     if (!url || !icon) continue;
@@ -49,6 +49,17 @@ export function filterRecords(records, query = '', category = 'all') {
   const words = query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
   return records.filter(item => (category === 'all' || item.category === category)
     && words.every(word => `${item.name} ${item.description} ${item.genre || item.category || ''}`.toLocaleLowerCase().includes(word)));
+}
+
+// Purpose and subject are different axes: an app's policy page is never a
+// standalone web product, and a public preview is not a launched service.
+export function partitionProjects(projects) {
+  const groups = { website: [], preview: [], 'app-support': [], newsletter: [] };
+  for (const project of projects) {
+    if (!Object.hasOwn(groups, project.kind)) throw new Error(`Unknown project kind: ${project.id}`);
+    groups[project.kind].push(project);
+  }
+  return groups;
 }
 
 export const arrow = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14" stroke="currentColor" stroke-width="1.5"/></svg>';

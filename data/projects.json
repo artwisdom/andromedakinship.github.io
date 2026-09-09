@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-09-04",
+  "verifiedAt": "2026-09-07",
   "projects": [
     {
       "id": "benchcalcs",
@@ -9,7 +9,8 @@
       "category": "Tools",
       "monogram": "BC",
       "status": "Live",
-      "featured": true
+      "featured": true,
+      "kind": "website"
     },
     {
       "id": "govwait",
@@ -19,7 +20,8 @@
       "category": "Data",
       "monogram": "GW",
       "status": "Live",
-      "featured": true
+      "featured": true,
+      "kind": "website"
     },
     {
       "id": "carsales",
@@ -29,7 +31,8 @@
       "category": "Work",
       "monogram": "CS",
       "status": "Live",
-      "featured": true
+      "featured": true,
+      "kind": "website"
     },
     {
       "id": "leaseworth",
@@ -39,7 +42,8 @@
       "category": "Tools",
       "monogram": "LW",
       "status": "Live",
-      "featured": false
+      "featured": false,
+      "kind": "website"
     },
     {
       "id": "rulegrid",
@@ -49,7 +53,8 @@
       "category": "Data",
       "monogram": "RG",
       "status": "Live",
-      "featured": false
+      "featured": false,
+      "kind": "website"
     },
     {
       "id": "statuterates",
@@ -59,7 +64,8 @@
       "category": "Data",
       "monogram": "SR",
       "status": "Live",
-      "featured": false
+      "featured": false,
+      "kind": "website"
     },
     {
       "id": "renewmark",
@@ -69,7 +75,8 @@
       "category": "Work",
       "monogram": "RM",
       "status": "Live",
-      "featured": false
+      "featured": false,
+      "kind": "website"
     },
     {
       "id": "funderfit",
@@ -79,7 +86,8 @@
       "category": "Data",
       "monogram": "FF",
       "status": "Live",
-      "featured": false
+      "featured": false,
+      "kind": "website"
     },
     {
       "id": "paybeacon",
@@ -89,7 +97,8 @@
       "category": "Data",
       "monogram": "PB",
       "status": "Live",
-      "featured": false
+      "featured": false,
+      "kind": "website"
     },
     {
       "id": "dwelldocket",
@@ -99,7 +108,8 @@
       "category": "Data",
       "monogram": "DD",
       "status": "Live",
-      "featured": false
+      "featured": false,
+      "kind": "website"
     },
     {
       "id": "crawlledger",
@@ -109,7 +119,8 @@
       "category": "Data",
       "monogram": "CL",
       "status": "Live",
-      "featured": false
+      "featured": false,
+      "kind": "website"
     },
     {
       "id": "provenday",
@@ -119,7 +130,8 @@
       "category": "Tools",
       "monogram": "PD",
       "status": "Live",
-      "featured": false
+      "featured": false,
+      "kind": "website"
     },
     {
       "id": "hitchmargin",
@@ -129,7 +141,8 @@
       "category": "Tools",
       "monogram": "HM",
       "status": "Live",
-      "featured": false
+      "featured": false,
+      "kind": "website"
     },
     {
       "id": "fountainpenregister",
@@ -139,7 +152,8 @@
       "category": "Creative",
       "monogram": "FP",
       "status": "Live",
-      "featured": false
+      "featured": false,
+      "kind": "website"
     },
     {
       "id": "dubetools",
@@ -149,7 +163,8 @@
       "category": "Tools",
       "monogram": "DT",
       "status": "Live",
-      "featured": false
+      "featured": false,
+      "kind": "website"
     },
     {
       "id": "complianceghost",
@@ -159,7 +174,8 @@
       "category": "Work",
       "monogram": "CG",
       "status": "Live",
-      "featured": false
+      "featured": false,
+      "kind": "website"
     },
     {
       "id": "regping",
@@ -169,27 +185,30 @@
       "category": "Work",
       "monogram": "RP",
       "status": "Live",
-      "featured": false
+      "featured": false,
+      "kind": "website"
     },
     {
       "id": "kitchenledger",
       "name": "Kitchen Ledger",
       "url": "https://artwisdom.github.io/kitchenledger-web/",
-      "description": "The home of the cottage-baker app: track sales, understand revenue caps, and keep a small food business organized.",
+      "description": "App information, privacy policy, terms, and support for Kitchen Ledger. The app itself is available on the App Store.",
       "category": "Work",
       "monogram": "KL",
-      "status": "Live",
-      "featured": false
+      "status": "App companion",
+      "featured": false,
+      "kind": "app-support"
     },
     {
       "id": "scrapmetal",
       "name": "ScrapMetal Intel",
       "url": "https://artwisdom.github.io/scrapmetalintel-web/",
-      "description": "The companion website for scrap-metal pricing, yard-rate tracking, and the ScrapMetal Intel app.",
+      "description": "Privacy policy, terms, and contact details for the Scrap Metal Intel app. Not a browser-based pricing tool.",
       "category": "Work",
       "monogram": "SM",
-      "status": "Live",
-      "featured": false
+      "status": "App support",
+      "featured": false,
+      "kind": "app-support"
     },
     {
       "id": "dealerops",
@@ -199,7 +218,8 @@
       "category": "Work",
       "monogram": "DO",
       "status": "Newsletter",
-      "featured": false
+      "featured": false,
+      "kind": "newsletter"
     },
     {
       "id": "baystatesites",
@@ -209,7 +229,8 @@
       "category": "Services",
       "monogram": "BS",
       "status": "Live",
-      "featured": false
+      "featured": false,
+      "kind": "website"
     },
     {
       "id": "hookferry",
@@ -219,7 +240,8 @@
       "category": "Tools",
       "monogram": "HF",
       "status": "Prelaunch",
-      "featured": false
+      "featured": false,
+      "kind": "preview"
     },
     {
       "id": "permitarchive",
@@ -229,7 +251,8 @@
       "category": "Data",
       "monogram": "PA",
       "status": "Source guides",
-      "featured": false
+      "featured": false,
+      "kind": "preview"
     },
     {
       "id": "ratearchive",
@@ -239,17 +262,19 @@
       "category": "Data",
       "monogram": "RA",
       "status": "Source guides",
-      "featured": false
+      "featured": false,
+      "kind": "preview"
     },
     {
       "id": "dutymesh",
       "name": "DutyMesh",
-      "url": "https://dutymesh-evidence.dube508.chatgpt.site/",
-      "description": "A public research preview of source-linked tariff evidence and import-cost guides. Transaction calculations are not yet live.",
+      "url": "https://usedutymesh.com/",
+      "description": "Source-linked import-duty evidence and trade-corridor guides. Full landed-cost calculations are not yet available.",
       "category": "Data",
       "monogram": "DM",
-      "status": "Research preview",
-      "featured": false
+      "status": "Evidence library",
+      "featured": false,
+      "kind": "preview"
     }
   ]
 }

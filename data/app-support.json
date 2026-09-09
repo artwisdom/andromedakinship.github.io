@@ -1,0 +1,19 @@
+{
+  "verifiedAt": "2026-09-07",
+  "entries": [
+    { "appId": 6759101731, "privacy": "/legal/privacy-policy.html", "terms": "/legal/terms-of-service.html" },
+    { "appId": 6761693793, "privacy": "/haggle/privacy.html", "terms": "/haggle/terms.html", "support": "/haggle/support.html" },
+    { "appId": 6785304150, "privacy": "/lesson-log-music-teacher/privacy.html", "terms": "/lesson-log-music-teacher/terms.html", "support": "/lesson-log-music-teacher/support.html" },
+    { "appId": 6785257595, "privacy": "/locksmith-job-tracker/privacy.html", "terms": "/locksmith-job-tracker/terms.html", "support": "/locksmith-job-tracker/support.html" },
+    { "appId": 6795738301, "privacy": "/mortgage-lo-commission-tracker/privacy.html", "terms": "/mortgage-lo-commission-tracker/terms.html", "support": "/mortgage-lo-commission-tracker/support.html" },
+    { "appId": 6790043505, "privacy": "/mystery-globe/privacy.html", "terms": "/mystery-globe/terms.html" },
+    { "appId": 6797306127, "privacy": "/stitchchart/privacy.html", "terms": "/stitchchart/terms.html" },
+    { "appId": 6776851535, "privacy": "/ag-equipment-sales-tracker-pro/privacy.html", "terms": "/ag-equipment-sales-tracker-pro/terms.html" },
+    { "appId": 6779042154, "privacy": "/cabinet-sales-tracker-pro/privacy.html", "terms": "/cabinet-sales-tracker-pro/terms.html" },
+    { "appId": 6776853180, "privacy": "/appliance-sales-tracker-pro/privacy.html", "terms": "/appliance-sales-tracker-pro/terms.html", "support": "/appliance-sales-tracker-pro/support.html", "repairSupport": true, "documentName": "Showfloor" },
+    { "appId": 6780880159, "privacy": "/mattress-sales-tracker-pro/privacy.html", "terms": "/mattress-sales-tracker-pro/terms.html", "support": "/mattress-sales-tracker-pro/support.html", "repairSupport": true, "documentName": "Mattress Sales Tracker Pro" },
+    { "appId": 6780880780, "privacy": "/pool-sales-tracker-pro/privacy.html", "terms": "/pool-sales-tracker-pro/terms.html", "documentName": "Pool Sales Tracker Pro" },
+    { "appId": 6779043964, "privacy": "/window-door-sales-tracker-pro/privacy.html", "terms": "/window-door-sales-tracker-pro/terms.html", "support": "/window-door-sales-tracker-pro/support.html", "repairSupport": true, "documentName": "Window & Door Sales Tracker" },
+    { "appId": 6780881689, "privacy": "/wine-spirits-sales-tracker-pro/privacy.html", "terms": "/wine-spirits-sales-tracker-pro/terms.html", "support": "/wine-spirits-sales-tracker-pro/support.html", "repairSupport": true, "documentName": "Wine & Spirits Sales Tracker" }
+  ]
+}

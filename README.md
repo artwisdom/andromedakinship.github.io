@@ -14,7 +14,7 @@ Confirm the remote, branch, clean/dirty state, and current GitHub Pages source b
 
 ## Edit and preview
 
-Requires Node.js 20 or newer. Building and previewing need no package installation. `npm ci --ignore-scripts` installs the one test-only dependency for independent QR decoding. No build service, paid font service, animation subscription, or QR subscription is required.
+Requires Node.js 20 or newer. Building and previewing need no package installation. `npm ci --ignore-scripts` installs two pinned, test-only dependencies: jsQR for independent QR decoding and axe-core for local accessibility scans. Neither ships in the live bundle. No build service, paid font service, animation subscription, or QR subscription is required.
 
 ```sh
 npm run build
@@ -33,8 +33,10 @@ Edit these source files:
 - `assets/qr.js`: locally generated App Store QR codes and accessible card-flip controls
 - `data/projects.json`: verified public website directory, including explicit early-stage labels
 - `data/apps.json`: dated U.S. App Store snapshot and curated app descriptions
+- `data/app-support.json` and `scripts/support.mjs`: verified policy mappings and generated support pages
+- `assets/document.css`: readability/landmark support for legacy documents without changing legal wording
 
-`npm run build` produces `index.html` and `assets/site.bundle.js`. Commit those generated files with their source changes. The homepage is static HTML: the full collections, meaningful links, and metadata are present before JavaScript runs. One versioned JavaScript bundle keeps shared code from getting mixed across cached releases.
+`npm run build` produces `index.html`, `assets/site.bundle.js`, `support.html`, and four repaired app-specific support pages. Commit those generated files with their source changes. The homepage is static HTML: the full collections, meaningful links, and metadata are present before JavaScript runs. One versioned JavaScript bundle keeps shared code from getting mixed across cached releases.
 
 ## Brand and content rules
 
@@ -44,7 +46,9 @@ Andromeda Kinship is the independent studio/umbrella. **Bay State Sites** is the
 
 Only verified public projects belong in the portfolio. A public reference/preview does not make its unreleased data or transaction features live. Keep private prototypes, internal tools, customer records, account details, financial reporting, and credentials out of the public catalog and this repository. Client sites are not automatically owned portfolio ventures.
 
-The September 4, 2026 directory contains 25 verified public web destinations and 25 live U.S. App Store apps. Research used current public pages, authenticated GitHub repository metadata, and existing project/domain records. A complete Cloudflare account inventory was unavailable; do not claim that this directory independently proves every domain in that account is included.
+The September 7, 2026 audit checked all 25 existing public destinations and separated them by purpose: 18 websites/tools, 4 previews or research projects, 2 app-support/companion sites, and 1 newsletter. Only the first group contributes to the website count. `kind` is required and the build rejects an unknown classification. CarSales and LeaseWorth legitimately appear in both web and app collections because their websites offer browser tools. Kitchen Ledger and ScrapMetal Intel do not count as standalone websites. DutyMesh now links directly to `https://usedutymesh.com/`.
+
+The current snapshot retains all 25 verified U.S. App Store apps (refreshed September 8 UTC / September 7 Eastern). A complete Cloudflare account inventory was not performed; do not claim the directory proves every domain or private project is included. See `docs/site-audit-2026-09-07.md` for scope, evidence, and unresolved content-review items.
 
 App popularity means **U.S. App Store rating count**, not installs, usage, or revenue. Ties use original release date, then name. Unrated apps do not receive an invented score. Each page load attempts a fresh lookup from the verified developer (ID `1858655640`), validates official Apple destinations, and retains the complete dated snapshot if Apple fails or returns an incomplete catalog. It avoids reshuffling cards while someone is already using the app section.
 
@@ -65,13 +69,18 @@ The encoder is [Project Nayuki's QR Code generator v1.8.0](https://github.com/na
 ## Accessibility and resilient motion
 
 - Native scrolling; no scroll hijacking, autoplay sound, tracking pixels, or sign-up overlay.
-- The decorative scene is ignored by assistive technology, capped at 30 frames per second, and stopped below its useful viewing area or when the tab is hidden.
+- The decorative scene is ignored by assistive technology, capped at 30 frames per second, and stopped below its useful viewing area or when the tab is hidden. The renderer combines a ray-marched dust volume with depth-positioned stars and a shared perspective camera; a third, composited pass adds the nearby star and planet only during the approach. The optional galaxy passage uses native page scrolling and can be bypassed by the hero's collection links.
+- Desktop resolution is capped at 1.25 device-pixel ratio and 1.6 million pixels; mobile uses at most 1.0 DPR, fewer stars, and fewer volume samples. No remote texture, 3D framework, or postprocessing service is needed.
+- The cinematic pass follows a curved galactic approach, then an exponential descent toward one original ringed planet. Analytic sphere/ring intersections provide opaque surface shading, front/back ring placement, the planet's shadow on its rings, a nearby star, and atmospheric glow. Surface detail is procedural and uses fewer noise samples on smaller/lower-power devices. The last camera position is 1.85 planet radii from its center on desktop and 3.15 on narrow screens; pointer orbit remains outside its surface.
+- The camera reaches that final position before the next content section enters the viewport. Nearby field-star trails respond to scroll movement and settle when scrolling stops; pointer parallax is bounded. The decorative passage is longer for the flight and shorter under reduced motion or without JavaScript. Pausing never changes the page height.
 - Reduced-motion preferences start with a still scene. Explicit pause/resume controls remember only this device-local preference.
 - WebGL failure leaves the galaxy photograph and all page content usable. JavaScript failure leaves the complete static catalogs and navigation usable.
 - Search/filter changes announce concise result counts. The mobile menu supports keyboard navigation, Escape, focus containment, and an inert background.
 - Card flips use real buttons, transfer focus to the visible side, make the hidden side inert, and return to the front on Escape. Reduced-motion and the site's pause setting remove the flip transition. Without JavaScript, all normal App Store links remain usable and QR controls stay hidden.
 
 The existing M31 photograph is by Adam Evans, licensed CC BY 2.0, with visible attribution. It remains the static fallback and existing social-preview image. The animated scene is an artistic interpretation, not an astronomical simulation.
+
+The 42 legacy policy pages and five existing app-support pages receive presentation-only accessibility improvements. `tests/policy-integrity.json` fingerprints each policy's title, visible wording (including dates), and body links before those changes. Do not regenerate these baselines to hide a changed policy; an intentional legal/content update requires its own review. The general support page no longer implies that every app stores/deletes data identically. SellCraft's policies are explicitly app-specific, not the portfolio's or RegPing's general privacy/terms pages.
 
 ## Checks and release
 
@@ -83,6 +92,8 @@ git diff --check
 Run `npm ci --ignore-scripts` once before tests in a fresh checkout. The checks include independent QR decoding for all 25 saved apps, focus/inert-state behavior, safe destinations, and icon format/content verification.
 
 For local failure-mode checks only, start the preview with `ANDROMEDA_QA=1 npm run dev`. The query modes `?qa=no-js`, `?qa=no-webgl`, `?qa=offline-apps`, and `?qa=reduced-motion` simulate failures/preferences in the local preview. They are not generated into the public homepage.
+
+`?qa=accessibility` adds a localhost-only axe-core scan and a rerun button to any HTML page; the JSON result is in `#qa-audit-result`. Wait for `#qa-audit-run:not([disabled])` before reading it. `?qa=scene-debug` exposes graphics errors, sample pixels, and draw calls on the local canvas for diagnosis. These checks are development fixtures only. Automated passes do not replace manual assistive-technology testing or a legal/commercial review of the apps.
 
 Before an authorized release, check desktop/mobile layouts, keyboard navigation, both catalog searches, all sort options, pause/resume, failure fallbacks, and existing legal/support pages. Preserve unrelated changes. The release flow is a reviewed commit followed by a push to `website`; do not change DNS or migrate the hosting project. Confirm the provider's completed build references that commit, then check the public homepage and versioned asset contents. A successful local build or push alone is not proof that the live site updated.
 

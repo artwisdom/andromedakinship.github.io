@@ -1,0 +1,10 @@
+/* Readability and navigation only. App policy language and URLs are unchanged. */
+html { color-scheme: light; }
+body { background: #fff; }
+#document-main { min-width: 0; overflow-wrap: anywhere; }
+#document-main a { color: #075aa8; text-underline-offset: 3px; }
+#document-main .meta, #document-main .updated, #document-main .effective-date,
+#document-main [style*="#86868b"] { color: #565f6b !important; }
+#document-main :focus-visible { outline: 2px solid #075aa8; outline-offset: 4px; }
+#document-main table { table-layout: fixed; max-width: 100%; }
+@media (forced-colors: active) { #document-main a { color: LinkText; } }

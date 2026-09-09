@@ -10,5 +10,5 @@
     "refresh:apps": "node scripts/refresh-apps.mjs"
   },
   "engines": { "node": ">=20" },
-  "devDependencies": { "jsqr": "1.4.0" }
+  "devDependencies": { "axe-core": "4.13.0", "jsqr": "1.4.0" }
 }
