@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { renderApp, renderProject, sortApps, partitionProjects } from '../assets/catalog.js';
 import { renderSupportPages, supportPath } from './support.mjs';
+import { STORM_TEXTURE_URL } from '../assets/galaxy.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = path => readFile(resolve(root, path), 'utf8');
@@ -22,7 +23,8 @@ if (new Set(web.projects.map(p => p.id)).size !== web.projects.length) throw new
 const source = await read('src/index.template.html');
 const modules = ['assets/vendor/qrcodegen.js', 'assets/catalog.js', 'assets/qr.js', 'assets/galaxy.js', 'assets/site.js'];
 const moduleSource = await Promise.all(modules.map(read));
-const version = createHash('sha256').update(source + await read('assets/site.css') + await read('favicon.svg') + moduleSource.join('\n')).digest('hex').slice(0, 12);
+const cloudAsset = await readFile(resolve(root,STORM_TEXTURE_URL.slice(1)));
+const version = createHash('sha256').update(source + await read('assets/site.css') + await read('favicon.svg') + moduleSource.join('\n')).update(cloudAsset).digest('hex').slice(0, 12);
 const schema = { '@context': 'https://schema.org', '@type': 'Organization', name: 'Andromeda Kinship', url: 'https://andromedakinship.com/', logo: 'https://andromedakinship.com/assets/brand/andromeda-kinship.svg', email: 'info@andromedakinship.com', description: 'An independent studio and family of purposeful apps, useful websites, and source-backed data projects.', founder: { '@type': 'Person', name: 'Michael Dube' }, sameAs: ['https://apps.apple.com/us/developer/michael-dube/id1858655640', 'https://www.etsy.com/shop/AndromedaKinship'] };
 const replacements = {
   VERSION: version, SCHEMA: json(schema), YEAR: snapshot.verifiedAt.slice(0, 4), PROJECT_COUNT: String(groups.website.length), PREVIEW_COUNT: String(groups.preview.length), APP_COUNT: String(snapshot.apps.length),

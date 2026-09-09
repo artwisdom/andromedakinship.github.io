@@ -14,6 +14,15 @@ const resources = JSON.parse(await read('data/app-support.json'));
 const groups = partitionProjects(JSON.parse(await read('data/projects.json')).projects);
 const hub = await read('support.html');
 
+test('Purchase AppFactory is available at the top and leads to the existing sale section', async () => {
+  const html=await read('index.html');
+  for(const section of [html.match(/<header\b[^]*?<\/header>/)[0],html.match(/<section class="hero"[^]*?<\/section>/)[0]]) {
+    assert.match(section,/<a[^>]*href="#appfactory"[^>]*>Purchase AppFactory /);
+  }
+  assert.match(html,/<section[^>]*id="appfactory"/);
+  assert.match(html,/mailto:info@andromedakinship.com\?subject=AppFactory%20Acquisition%20Inquiry/);
+});
+
 test('support directory includes every saved app, with companion sites separated from products', () => {
   assert.equal((hub.match(/class="support-entry"/g)||[]).length,snapshot.apps.length);
   for (const app of snapshot.apps) assert.ok(hub.includes(`id="app-${app.id}"`));
@@ -82,6 +91,20 @@ test('rendering budgets remain bounded and no remote 3D library or tracker is ad
   assert.match(galaxy,/now - lastDraw >= 31/);
   assert.doesNotMatch(galaxy,/https?:|addEventListener\(['"]wheel/);
   const bundle=await read('assets/site.bundle.js'); assert.ok(Buffer.byteLength(bundle)<95000);
+});
+
+test('cloud artwork is a bounded local image included in release cache invalidation', async () => {
+  const data=await readFile(resolve(root,'assets/storm-clouds-v2.jpg'));
+  assert.equal(data.readUInt16BE(0),0xffd8); assert.ok(data.length<600000);
+  let dimensions;
+  for(let offset=2;offset<data.length-9;) {
+    assert.equal(data[offset],0xff); const marker=data[offset+1],size=data.readUInt16BE(offset+2);
+    if(marker===0xc0||marker===0xc2) { dimensions=[data.readUInt16BE(offset+7),data.readUInt16BE(offset+5)]; break; }
+    if(marker===0xda) break; offset+=size+2;
+  }
+  assert.deepEqual(dimensions,[1254,1254]);
+  assert.match(await read('scripts/build.mjs'),/update\(cloudAsset\)/);
+  assert.match(await read('assets/galaxy.js'),/STORM_TEXTURE_URL\+new URL\(import.meta.url\).search/);
 });
 
 test('all 42 policy titles, wording, dates, and body links match the pre-audit baseline', async () => {

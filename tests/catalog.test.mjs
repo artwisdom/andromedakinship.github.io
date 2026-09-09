@@ -109,6 +109,21 @@ test('original legal URLs and AppFactory inquiry remain available', async () => 
   }
   assert.match(html, /id="appfactory"/); assert.match(html, /AppFactory%20Acquisition%20Inquiry/);
 });
+
+test('AppFactory explains the creator-supplied sale inventory with qualified operating claims', () => {
+  const factory=html.match(/<section class="appfactory-panel"[^]*?<\/section>/)?.[0];
+  assert.ok(factory); assert.match(factory,/FOR SALE/); assert.match(factory,/outright project acquisition/);
+  for(const phrase of ['Purpose-built prompts','Review &amp; refinement passes','Quality checks','18-phase','engineering brief','workflow documentation','launch playbook','28 app workspaces produced','not a count of currently listed apps','supplied by the creator','usage charges are separate','do not guarantee']) assert.ok(factory.includes(phrase),phrase);
+  assert.match(factory,/AppFactory%20Acquisition%20Inquiry/);
+  assert.doesNotMatch(factory,/zero (?:cost|marginal cost|recurring)|guaranteed|passive income|revenue share|100% automated|28 (?:live|published) apps|AppFactory 1\.0/i);
+  assert.match(factory,/aria-labelledby="factory-title"/);
+  for (const [metric,count] of [['phases',18],['checks',52],['agents',13],['learnings',116]]) assert.match(factory,new RegExp(`data-factory-metric="${metric}"[^]*?<dd>${count}</dd>`));
+  const phases=[...factory.matchAll(/data-phase="([^"]+)"/g)].map(m=>m[1]);
+  assert.deepEqual(phases,['research','brand-name','aso','design','aso-mockup-render','build','launch-smoketest','first-run-flowtest','veteran-fit','compliance-static','compliance-dynamic','qa','iap-review-render','aso-screenshot-composite','taste-critic','asc-metadata','compliance-pre-submit','submit']);
+  assert.equal((factory.match(/<details /g)||[]).length,5);
+  const agents=factory.match(/<ul class="factory-agents">([^]*?)<\/ul>/)[1];
+  assert.equal((agents.match(/<li>/g)||[]).length,13);
+});
 test('document metadata has one canonical origin and valid organization JSON', () => {
   assert.equal((html.match(/<h1\b/g) || []).length, 1); assert.match(html, /rel="canonical" href="https:\/\/andromedakinship.com\/"/);
   const schema = JSON.parse(html.match(/<script type="application\/ld\+json">([^]*?)<\/script>/)[1]);

@@ -1,7 +1,11 @@
 // Original 3D artwork, not an astronomical simulation. Luminous dust, dark lanes
 // and a nearby star system share one perspective camera. Native scroll moves it.
 export const PLANET_CENTER = Object.freeze([.28,1.32,.16]);
-export const PLANET_RADIUS = .075;
+// A thousandfold smaller world; the local render frame preserves surface precision.
+export const PLANET_RADIUS = .000075;
+export const STORM_REGION = Object.freeze([-.78,-.32,.54]);
+export const FLASH_INTERVAL_SECONDS = 1.65;
+export const STORM_TEXTURE_URL = '/assets/storm-clouds-v2.jpg';
 const quadVertex = `
 attribute vec2 aPosition;
 varying vec2 vUv;
@@ -10,7 +14,7 @@ void main() { vUv = aPosition * .5 + .5; gl_Position = vec4(aPosition, 0., 1.); 
 const cameraUniforms = `
 uniform vec3 uCamera, uRight, uUp, uForward;
 uniform vec2 uOffset;
-uniform float uAspect, uTime, uProgress, uDpr, uMobile, uTravel, uArrival;
+uniform float uAspect, uTime, uProgress, uDpr, uMobile, uTravel, uArrival, uReveal;
 `;
 const dustFragment = `
 precision highp float;
@@ -69,7 +73,7 @@ void main() {
   vec2 flare = (vUv * 2. - 1. - coreScreen) * vec2(uAspect,1.);
   light += vec3(.3,.48,.8) * exp(-abs(flare.y) * 110.) * exp(-abs(flare.x) * 1.15) * .32;
   light = 1. - exp(-light * 1.35);
-  gl_FragColor = vec4(light * mix(1.,.14,uArrival), 1.);
+  gl_FragColor = vec4(light * mix(1.,.065,smoothstep(.22,.87,uArrival)), 1.);
 }`;
 const starVertex = `
 attribute vec3 aPosition, aColor;
@@ -93,7 +97,7 @@ void main() {
   vStretch = field ? 1. + uTravel * 3.8 : 1.;
   vAxis = normalize(projected + vec2(.0001));
   gl_PointSize = clamp(size * uDpr * 9. * sqrt(vStretch) / max(.35, depth), .65, mix(56.,40.,uMobile) * uDpr);
-  vOpacity = smoothstep(.2, 1.2, depth) * (field ? .9 : mix(.58,.24,uProgress)) * mix(1.,field ? .4 : .12,uArrival);
+  vOpacity = smoothstep(.2, 1.2, depth) * (field ? .9 : mix(.58,.24,uProgress)) * mix(1.,field ? .4 : .07,smoothstep(.22,.87,uArrival));
   vBright = step(2.3, size);
   vColor = aColor;
   if (depth < .18) { gl_Position = vec4(2., 2., 2., 1.); vOpacity = 0.; }
@@ -114,13 +118,19 @@ void main() {
 }`;
 // Analytic spheres and a ring plane use the same world-space rays as the dust.
 // The premultiplied-alpha pass occludes background stars on the planet's night
-// side, places rings in front/behind correctly, and needs no downloaded texture.
+// side and places rings in front/behind correctly. The optional local cloud map
+// is filtered at every distance; a procedural fallback survives a failed load.
 const systemFragment = `
 precision highp float;
 varying vec2 vUv;
 ${cameraUniforms}
+uniform vec3 uSystemCamera;
+uniform vec4 uFlash;
+uniform sampler2D uCloudMap;
+uniform float uCloudBlend;
 const vec3 planet = vec3(${PLANET_CENTER.join(',')});
-const float radius = ${PLANET_RADIUS};
+const float radius = .075;
+const vec3 weatherCenter = normalize(vec3(${STORM_REGION.join(',')}));
 const vec3 sun = vec3(-.14,1.14,.30);
 float hash3(vec3 p) {
   p = fract(p * .1031); p += dot(p,p.yzx + 33.33);
@@ -134,9 +144,32 @@ float noise3(vec3 p) {
 float textureField(vec3 p) {
   return noise3(p) * .56 + noise3(p*2.03+7.) * .28 + noise3(p*4.11-3.) * .16;
 }
+// Triplanar projection has no longitude seam or pinched poles. Mipmaps remove
+// distant shimmer; linear magnification preserves feathered cloud boundaries.
+float cloudMap(vec3 p) {
+  vec3 weights=pow(abs(normalize(p)),vec3(6.));
+  weights/=weights.x+weights.y+weights.z;
+  return texture2D(uCloudMap,p.yz*.72+vec2(.31,.17)).r*weights.x
+    +texture2D(uCloudMap,p.zx*.72+vec2(.61,.43)).r*weights.y
+    +texture2D(uCloudMap,p.xy*.72+vec2(.13,.73)).r*weights.z;
+}
+// Curl the cloud coordinates around storm centers on the actual sphere.
+vec3 vortex(vec3 p, vec3 center, float strength) {
+  float distance = length(p-center);
+  float angle = strength*exp(-distance*distance*22.);
+  return p*cos(angle)+cross(center,p)*sin(angle)+center*dot(center,p)*(1.-cos(angle));
+}
+// From orbit, a discharge illuminates a tiny volume of cloud, not a drawn bolt.
+float cloudLight(vec3 p) {
+  vec3 delta = p-uFlash.xyz;
+  float distance2 = dot(delta,delta);
+  return (exp(-distance2*1900.)*.8+exp(-distance2*620.)*.2)*uFlash.w;
+}
 float sphereHit(vec3 origin, vec3 ray, vec3 center, float size) {
   vec3 relative = origin-center; float b = dot(relative,ray);
-  float h = b*b - dot(relative,relative) + size*size;
+  // Perpendicular distance avoids subtracting two huge squares on early reveal.
+  vec3 perpendicular=relative-ray*b;
+  float h = size*size-dot(perpendicular,perpendicular);
   if (h < 0.) return -1.;
   float nearHit = -b-sqrt(h); return nearHit > .00001 ? nearHit : -1.;
 }
@@ -144,46 +177,47 @@ vec4 over(vec4 front, vec4 back) { return front + back * (1.-front.a); }
 void main() {
   vec2 uv = (vUv*2.-1.-uOffset) * vec2(uAspect,1.) / 1.85;
   vec3 ray = normalize(uForward + uv.x*uRight + uv.y*uUp);
+  vec3 origin = uSystemCamera;
   vec4 result = vec4(0.);
-  float planetHit = sphereHit(uCamera,ray,planet,radius);
-  float sunAhead = dot(sun-uCamera,ray);
-  float sunDistance = length((sun-uCamera)-ray*max(0.,sunAhead));
+  float planetHit = sphereHit(origin,ray,planet,radius);
+  float sunAhead = dot(sun-origin,ray);
+  float sunDistance = length((sun-origin)-ray*max(0.,sunAhead));
   if (sunAhead > 0.) {
     float corona = exp(-max(0.,sunDistance-.027)*105.) * .36 + exp(-sunDistance*35.) * .07;
-    result.rgb += vec3(1.,.58,.22) * corona;
-    float sunHit = sphereHit(uCamera,ray,sun,.027);
+    result.rgb += vec3(.38,.49,.78) * corona*.65;
+    float sunHit = sphereHit(origin,ray,sun,.027);
     if (sunHit > 0.) {
-      vec3 normal = normalize(uCamera+ray*sunHit-sun);
+      vec3 normal = normalize(origin+ray*sunHit-sun);
       float granules = textureField(normal*22.+uTime*.025);
-      vec3 photosphere = mix(vec3(1.,.39,.08),vec3(1.,.92,.62),.4+granules*.6);
+      vec3 photosphere = mix(vec3(.28,.37,.58),vec3(.73,.82,1.),.4+granules*.6);
       photosphere *= .55+.45*pow(max(0.,dot(normal,-ray)),.25);
       result = vec4(photosphere,1.);
     }
   }
   // The atmosphere exists around the sphere, not as a flat screen-space halo.
-  float closest = max(0.,dot(planet-uCamera,ray));
-  float separation = length(uCamera+ray*closest-planet)/radius;
+  float closest = max(0.,dot(planet-origin,ray));
+  float separation = length(origin+ray*closest-planet)/radius;
   if (closest > 0. && separation > 1.) {
-    vec3 limbNormal = normalize(uCamera+ray*closest-planet);
+    vec3 limbNormal = normalize(origin+ray*closest-planet);
     float illumination = .15+.85*max(0.,dot(limbNormal,normalize(sun-planet)));
     float atmosphere = exp(-(separation-1.)*48.)*.5 + exp(-(separation-1.)*14.)*.06;
-    result.rgb += vec3(.12,.58,1.) * atmosphere * illumination;
+    result.rgb += vec3(.19,.29,.65) * atmosphere * illumination;
   }
   vec3 axis = normalize(vec3(-.10,.18,.98));
   float ringDenominator = dot(ray,axis), ringHit = -1.;
   vec4 ringColor = vec4(0.);
   if (abs(ringDenominator) > .0001) {
-    ringHit = dot(planet-uCamera,axis)/ringDenominator;
+    ringHit = dot(planet-origin,axis)/ringDenominator;
     if (ringHit > 0.) {
-      vec3 point = uCamera+ray*ringHit;
+      vec3 point = origin+ray*ringHit;
       float r = length(point-planet)/radius;
       if (r > 1.32 && r < 2.38) {
         float grain = noise3((point-planet)/radius*110.);
         float bands = .5+.5*sin(r*235.+sin(r*67.)*1.8);
         float edge = smoothstep(1.32,1.4,r)*(1.-smoothstep(2.25,2.38,r));
         float division = smoothstep(.006,.025,abs(r-1.94));
-        float opacity = (.17+.32*bands+.09*grain)*edge*division;
-        vec3 color = mix(vec3(.2,.36,.48),vec3(.8,.66,.47),.35+.4*bands);
+        float opacity = (.10+.19*bands+.06*grain)*edge*division;
+        vec3 color = mix(vec3(.09,.13,.21),vec3(.32,.35,.42),.35+.4*bands);
         vec3 lightDirection = normalize(sun-point);
         float shadow = sphereHit(point+lightDirection*.0001,lightDirection,planet,radius) > 0. ? .09 : 1.;
         color *= (.55+.45*abs(dot(axis,lightDirection))) * shadow;
@@ -193,34 +227,47 @@ void main() {
   }
   if (planetHit < 0. || ringHit > planetHit) result = over(ringColor,result);
   if (planetHit > 0.) {
-    vec3 point = uCamera+ray*planetHit, normal = normalize(point-planet);
+    vec3 point = origin+ray*planetHit, normal = normalize(point-planet);
     vec3 tangent = normalize(cross(vec3(0,1,0),axis));
     vec3 p = vec3(dot(normal,tangent),dot(normal,cross(axis,tangent)),dot(normal,axis));
-    float spin = uTime*.021;
+    float spin = sin(uTime*.012)*.12;
     p.xy = mat2(cos(spin),-sin(spin),sin(spin),cos(spin))*p.xy;
-    float turbulence = textureField(p*5.4);
-    float fine = uMobile > .5 ? noise3(p*42.) : textureField(p*58.);
-    float belts = .5+.5*sin(p.z*43.+turbulence*6.+fine*.8);
-    float ribbons = .5+.5*sin(p.z*145.+turbulence*17.);
-    vec3 albedo = mix(vec3(.016,.085,.16),vec3(.10,.43,.47),smoothstep(.1,.75,belts));
-    albedo = mix(albedo,vec3(.72,.56,.34),smoothstep(.70,.95,belts)*.72);
-    albedo = mix(albedo,vec3(.56,.75,.77),smoothstep(.72,.91,fine)*.48);
-    albedo *= .76+.24*ribbons;
-    vec3 stormCenter = normalize(vec3(.25,-.86,.37));
-    float stormDistance = length(p-stormCenter);
-    float storm = 1.-smoothstep(.10,.23,stormDistance);
-    float swirl = .5+.5*sin(atan(p.z-stormCenter.z,p.x-stormCenter.x)*3.+stormDistance*100.);
-    albedo = mix(albedo,mix(vec3(.14,.25,.31),vec3(.78,.60,.36),swirl),storm*.82);
+    // A raised cloud deck and a second drifting veil sit above the dark crust.
+    // Sample their own sphere intersection, not the ground's flat coordinates.
+    float cloudHit=sphereHit(origin,ray,planet,radius*1.018);
+    vec3 cloudNormal=normalize(origin+ray*cloudHit-planet);
+    vec3 cp=vec3(dot(cloudNormal,tangent),dot(cloudNormal,cross(axis,tangent)),dot(cloudNormal,axis));
+    cp.xy=mat2(cos(spin),-sin(spin),sin(spin),cos(spin))*cp.xy;
+    vec3 wind=vec3(sin(uTime*.004),cos(uTime*.003)-1.,sin(uTime*.002))*.035;
+    vec3 q=vortex(cp,normalize(vec3(-.50,-.75,.44)),.24)+wind;
+    float broad=textureField(q*4.);
+    float region=smoothstep(.14,.29,dot(cp,weatherCenter)+(broad-.5)*.16);
+    float billows=mix(broad,cloudMap(q),uCloudBlend);
+    float veil=mix(broad,cloudMap(q*1.73-wind*1.8+vec3(.17,-.09,.23)),uCloudBlend);
+    float cover=region*smoothstep(.12,.68,billows);
+    float height=smoothstep(.16,.78,billows);
+    float shadow=mix(broad,cloudMap(q+vec3(-.021,-.009,.016)),uCloudBlend);
+    vec3 crust=mix(vec3(.009,.015,.026),vec3(.033,.045,.066),textureField(p*7.));
+    crust*=1.-region*shadow*.48;
+    vec3 cloud=mix(vec3(.042,.054,.081),vec3(.32,.37,.46),height);
+    cloud*=clamp(.83+(billows-shadow)*.7,.58,1.);
+    vec3 albedo=mix(crust,cloud,cover);
+    albedo=mix(albedo,vec3(.12,.15,.23),region*smoothstep(.35,.76,veil)*.19);
     vec3 lightDirection = normalize(sun-point);
     float day = max(0.,dot(normal,lightDirection));
     float rim = pow(1.-max(0.,dot(normal,-ray)),3.4);
-    vec3 color = albedo*(vec3(.035,.065,.11)+vec3(1.8,1.57,1.25)*day);
-    color += vec3(.045,.33,.7)*rim*(.16+day);
-    color = pow(max(vec3(0.),color),vec3(.8));
+    vec3 color = albedo*(vec3(.23,.28,.46)+vec3(.75,.86,1.12)*day);
+    color += vec3(.032,.052,.12)*rim*(.22+day);
+    color += vec3(.014,.019,.036)*pow(1.-day,2.)*region*veil;
+    // One independently placed event at a time; the cloud texture breaks up its
+    // diffuse glow. Calm regions and the planet-wide exposure never flash.
+    color += vec3(.50,.65,1.1)*cloudLight(cp)*max(cover,.35*region)*(.6+billows*.6);
+    color = pow(max(vec3(0.),color),vec3(.88));
+    color = min(color,vec3(.88,.93,1.));
     result = over(vec4(color,1.),result);
   }
   if (planetHit > 0. && ringHit > 0. && ringHit < planetHit) result = over(ringColor,result);
-  gl_FragColor = result * smoothstep(0.,.09,uArrival);
+  gl_FragColor = result*uReveal;
 }`;
 const clamp01 = value => Math.min(1, Math.max(0, Number.isFinite(value) ? value : 0));
 const mix = (a, b, t) => a + (b - a) * t;
@@ -229,18 +276,40 @@ const curve = (a, b, c, d, t) => a * (1-t) ** 3 + 3 * b * t * (1-t) ** 2 + 3 * c
 const normalize = v => { const length = Math.hypot(...v) || 1; return v.map(x => x / length); };
 const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 
+export function stormRegion(point) {
+  const center=normalize(STORM_REGION), p=normalize(point);
+  return ease((p.reduce((sum,v,i)=>sum+v*center[i],0)-.14)/.15);
+}
+
+// Spatially scattered, non-overlapping events, with jittered onset and strength.
+// Only one tiny cloud patch can light at a time. The common *clock* freezes on
+// pause, not a common envelope that illuminates every storm simultaneously.
+export function stormFlash(seconds) {
+  const time=Number.isFinite(seconds)?Math.max(0,seconds):0;
+  const slot=Math.floor(time/FLASH_INTERVAL_SECONDS), phase=time-slot*FLASH_INTERVAL_SECONDS;
+  const random=n=>{const v=Math.sin(n*127.1+311.7)*43758.5453; return v-Math.floor(v);};
+  const center=normalize(STORM_REGION), right=normalize(cross(center,[0,0,1])), up=cross(right,center);
+  const z=mix(.42,.96,random(slot+1)), angle=random(slot+19)*Math.PI*2, r=Math.sqrt(1-z*z);
+  const point=center.map((v,i)=>v*z+r*(right[i]*Math.cos(angle)+up[i]*Math.sin(angle)));
+  const age=phase-(.12+random(slot+47)*.25);
+  const energy=ease(age/.22)*(1-ease((age-.26)/.48))*(.68+random(slot+83)*.32);
+  return [...point,energy];
+}
+
 export function galaxyProgress(scroll, end, height) {
   return clamp01(scroll / Math.max(1,end - Math.max(1,height) * 1.15));
 }
 
-export function systemArrival(progress) { return ease((clamp01(progress)-.46)/.54); }
+export function systemArrival(progress) { return ease((clamp01(progress)-.55)/.43); }
+export function systemReveal(progress) { return ease((clamp01(progress)-.70)/.075); }
 
 // All render passes use this testable camera basis. Nearby stars exhibit real
 // depth-dependent parallax rather than moving as a screen-space wallpaper.
 export function galaxyView(value, mobile = false, pointer = [0, 0]) {
   const progress = clamp01(value), t = ease(progress/.64), arrival = systemArrival(progress);
   const [px,py] = [0,1].map(i => Math.max(-1,Math.min(1,Number.isFinite(pointer[i]) ? pointer[i] : 0)));
-  // Galactic scale gives way to an exponential approach to a single world.
+  // The late, steep logarithmic dive crosses three extra orders of magnitude.
+  // The planet is not revealed until after the initial stellar-scale descent.
   // Orbiting changes the view without ever moving the camera inside the sphere.
   const parallax = mix(.62,.18,t);
   const wideCamera = [curve(-1.8,5.,3.9,1.1,t) + px * parallax, curve(-6.8,-6.6,-1.6,-.72,t) + py * parallax * .55, curve(6.4,4.8,.95,.48,t)];
@@ -250,7 +319,7 @@ export function galaxyView(value, mobile = false, pointer = [0, 0]) {
   const distance = Math.exp(mix(Math.log(Math.hypot(...relative)),Math.log(PLANET_RADIUS*(mobile?3.15:1.85)),arrival));
   const camera = PLANET_CENTER.map((v,i)=>v+direction[i]*distance);
   const wideTarget = [mix(0,.25,t) + px * .18, mix(0,1.6,t) + py * .12, 0];
-  const target = wideTarget.map((v,i)=>mix(v,PLANET_CENTER[i],arrival));
+  const target = wideTarget.map((v,i)=>mix(v,PLANET_CENTER[i],ease((progress-.46)/.24)));
   const forward = normalize(target.map((x, i) => x - camera[i]));
   const baseRight = normalize(cross(forward, [0, 0, 1]));
   const baseUp = cross(baseRight, forward), roll = mix(-.4,.08,t) + px * .025;
@@ -264,8 +333,11 @@ export function createGalaxy(canvas, { reducedMotion = false, paused = false } =
   try { gl = canvas.getContext('webgl', { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: 'low-power' }); } catch { return null; }
   if (!gl) return null;
   const programs = [], buffers = [], shaders = [];
+  let cloudTexture=null, cloudImage=null, cloudLoaded=false, cloudBlend=0;
   function cleanup() {
     buffers.forEach(buffer => gl.deleteBuffer(buffer)); programs.forEach(program => gl.deleteProgram(program)); shaders.forEach(shader => gl.deleteShader(shader));
+    if(cloudImage) cloudImage.onload=cloudImage.onerror=null;
+    if(cloudTexture) { gl.deleteTexture(cloudTexture); cloudTexture=null; }
   }
   function compile(type, source) {
     const shader = gl.createShader(type);
@@ -280,7 +352,7 @@ export function createGalaxy(canvas, { reducedMotion = false, paused = false } =
     programs.push(program);
     gl.attachShader(program, compile(gl.VERTEX_SHADER, vertex)); gl.attachShader(program, compile(gl.FRAGMENT_SHADER, fragment)); gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error('Galaxy unavailable');
-    const keys = ['uCamera', 'uRight', 'uUp', 'uForward', 'uOffset', 'uAspect', 'uTime', 'uProgress', 'uDpr', 'uMobile', 'uTravel', 'uArrival'];
+    const keys = ['uCamera', 'uRight', 'uUp', 'uForward', 'uOffset', 'uAspect', 'uTime', 'uProgress', 'uDpr', 'uMobile', 'uTravel', 'uArrival', 'uReveal', 'uSystemCamera', 'uFlash', 'uCloudMap', 'uCloudBlend'];
     return { program, uniforms: Object.fromEntries(keys.map(key => [key, gl.getUniformLocation(program, key)])) };
   }
   let dust, stars, system, quadBuffer, starBuffer;
@@ -290,6 +362,14 @@ export function createGalaxy(canvas, { reducedMotion = false, paused = false } =
   const fieldCount = lowPower || mobileInitially ? 280 : 720;
   try {
     dust = makeProgram(quadVertex, dustFragment); stars = makeProgram(starVertex, starFragment); system = makeProgram(quadVertex,systemFragment);
+    cloudTexture=gl.createTexture();
+    if(!cloudTexture) throw new Error('Cloud texture unavailable');
+    gl.bindTexture(gl.TEXTURE_2D,cloudTexture);
+    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([128,128,128,255]));
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.MIRRORED_REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.MIRRORED_REPEAT);
     let seed = 20260907;
     const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
     const normal = () => Math.sqrt(-2 * Math.log(Math.max(.00001, random()))) * Math.cos(2 * Math.PI * random());
@@ -328,11 +408,40 @@ export function createGalaxy(canvas, { reducedMotion = false, paused = false } =
   const pointer = [0, 0], targetPointer = [0, 0];
   const state = { paused, reducedMotion };
   const active = () => !state.paused && !state.reducedMotion && visible && !document.hidden && !lost && !destroyed;
+  function loadClouds() {
+    if(cloudImage || typeof Image==='undefined') return;
+    cloudImage=new Image(); cloudImage.decoding='async'; cloudImage.fetchPriority='low';
+    cloudImage.onload=()=>{
+      if(lost || destroyed) return;
+      try {
+        // Resample only for the GPU's power-of-two mipmap requirement. This
+        // does not claim extra source detail; the asset's native size is 1254px.
+        const size=lowPower || width<720 ? 1024 : 2048;
+        const tile=document.createElement('canvas'); tile.width=tile.height=size;
+        const context=tile.getContext('2d'); if(!context) return;
+        context.imageSmoothingEnabled=true; context.imageSmoothingQuality='high';
+        context.drawImage(cloudImage,0,0,size,size);
+        gl.bindTexture(gl.TEXTURE_2D,cloudTexture);
+        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,tile);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);
+        cloudLoaded=true;
+      } catch { /* Retain the complete placeholder and procedural weather. */ }
+    };
+    cloudImage.onerror=()=>{};
+    cloudImage.src=STORM_TEXTURE_URL+new URL(import.meta.url).search;
+  }
   function uniforms(renderer, view) {
     gl.useProgram(renderer.program);
     for (const key of ['camera', 'right', 'up', 'forward']) gl.uniform3fv(renderer.uniforms[`u${key[0].toUpperCase()}${key.slice(1)}`], view[key]);
     gl.uniform2f(renderer.uniforms.uOffset, ...view.offset);
-    for (const [key, value] of Object.entries({ uAspect: width / height, uTime: time, uProgress: progress, uDpr: dpr, uMobile: width < 720 || lowPower ? 1 : 0, uTravel: travel, uArrival: systemArrival(progress) })) gl.uniform1f(renderer.uniforms[key], value);
+    for (const [key, value] of Object.entries({ uAspect: width / height, uTime: time, uProgress: progress, uDpr: dpr, uMobile: width < 720 || lowPower ? 1 : 0, uTravel: travel, uArrival: systemArrival(progress), uReveal: systemReveal(progress) })) gl.uniform1f(renderer.uniforms[key], value);
+    if (renderer===system) {
+      gl.uniform3fv(renderer.uniforms.uSystemCamera,view.camera.map((v,i)=>PLANET_CENTER[i]+(v-PLANET_CENTER[i])*.075/PLANET_RADIUS));
+      gl.uniform4fv(renderer.uniforms.uFlash,stormFlash(time));
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,cloudTexture);
+      gl.uniform1i(renderer.uniforms.uCloudMap,0); gl.uniform1f(renderer.uniforms.uCloudBlend,cloudBlend);
+    }
   }
   function draw() {
     if (lost || destroyed) return;
@@ -347,7 +456,7 @@ export function createGalaxy(canvas, { reducedMotion = false, paused = false } =
     uniforms(stars, view); gl.bindBuffer(gl.ARRAY_BUFFER, starBuffer);
     for (const [name, size, offset] of [['aPosition', 3, 0], ['aColor', 3, 12], ['aSize', 1, 24]]) attribute(stars.program, name, size, 28, offset);
     gl.drawArrays(gl.POINTS, 0, count + fieldCount);
-    if (systemArrival(progress) > .0001) {
+    if (systemReveal(progress) > .0001) {
       gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
       uniforms(system,view); gl.bindBuffer(gl.ARRAY_BUFFER,quadBuffer);
       for (const name of ['aPosition','aColor','aSize']) {
@@ -365,6 +474,8 @@ export function createGalaxy(canvas, { reducedMotion = false, paused = false } =
       time += elapsed; last = now; lastDraw = now;
       const advance = (targetProgress - progress) * .085;
       progress += advance;
+      if(progress>.18) loadClouds();
+      cloudBlend+=(Number(cloudLoaded)-cloudBlend)*.08;
       travel += (Math.min(1,Math.abs(advance)*85) - travel) * .16;
       pointer.forEach((value, i) => { pointer[i] += (targetPointer[i] - value) * .055; });
       draw();
@@ -376,7 +487,7 @@ export function createGalaxy(canvas, { reducedMotion = false, paused = false } =
   function resize() {
     width = Math.max(1, innerWidth); height = Math.max(1, innerHeight);
     // Bound pixel fill for the dust volume, including on retina/large screens.
-    dpr = Math.min(devicePixelRatio || 1, width < 720 || lowPower ? 1 : 1.25, Math.sqrt(1600000 / (width * height)));
+    dpr = Math.min(devicePixelRatio || 1, lowPower ? 1 : width < 720 ? 1.75 : 1.5, Math.sqrt(1600000 / (width * height)));
     canvas.width = Math.max(1, Math.round(width * dpr)); canvas.height = Math.max(1, Math.round(height * dpr));
     gl.viewport(0, 0, canvas.width, canvas.height); draw();
   }
