@@ -1009,7 +1009,7 @@ export const PLANET_CENTER = Object.freeze([.28,1.32,.16]);
 // A thousandfold smaller world; the local render frame preserves surface precision.
 export const PLANET_RADIUS = .000075;
 export const STORM_REGION = Object.freeze([-.78,-.32,.54]);
-export const FLASH_INTERVAL_SECONDS = 1.65;
+export const FLASH_INTERVAL_SECONDS = .82;
 export const STORM_TEXTURE_URL = '/assets/storm-clouds-v2.jpg';
 const quadVertex = `
 attribute vec2 aPosition;
@@ -1286,7 +1286,8 @@ export function stormRegion(point) {
   return ease((p.reduce((sum,v,i)=>sum+v*center[i],0)-.14)/.15);
 }
 
-// Spatially scattered, non-overlapping events, with jittered onset and strength.
+// Near-continuous, non-overlapping cloud events with jittered onset, duration,
+// and strength. Brief dark gaps keep each new location from snapping on.
 // Only one tiny cloud patch can light at a time. The common *clock* freezes on
 // pause, not a common envelope that illuminates every storm simultaneously.
 export function stormFlash(seconds) {
@@ -1296,8 +1297,8 @@ export function stormFlash(seconds) {
   const center=normalize(STORM_REGION), right=normalize(cross(center,[0,0,1])), up=cross(right,center);
   const z=mix(.42,.96,random(slot+1)), angle=random(slot+19)*Math.PI*2, r=Math.sqrt(1-z*z);
   const point=center.map((v,i)=>v*z+r*(right[i]*Math.cos(angle)+up[i]*Math.sin(angle)));
-  const age=phase-(.12+random(slot+47)*.25);
-  const energy=ease(age/.22)*(1-ease((age-.26)/.48))*(.68+random(slot+83)*.32);
+  const age=phase-(.015+random(slot+47)*.06), duration=.70+random(slot+109)*.025;
+  const energy=ease(age/.16)*(1-ease((age-.20)/(duration-.20)))*(.68+random(slot+83)*.32);
   return [...point,energy];
 }
 

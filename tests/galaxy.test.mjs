@@ -121,24 +121,34 @@ test('the weather region covers about two fifths of the sphere, leaving calmer s
   assert.ok(coverage/10000>.38&&coverage/10000<.41);
 });
 
-test('cloud glows occur separately, at scattered storm positions, with a dark gap between events', () => {
-  assert.equal(FLASH_INTERVAL_SECONDS,1.65);
+test('near-continuous cloud glows vary timing and position while retaining short dark gaps', () => {
+  assert.equal(FLASH_INTERVAL_SECONDS,.82);
   for(const value of [NaN,Infinity,-Infinity,-5,0]) assert.equal(stormFlash(value)[3],0);
-  const positions=new Set();
+  const positions=new Set(), onsets=new Set(), durations=new Set();
+  const steps=Math.round(FLASH_INTERVAL_SECONDS*1000);
+  let activeSamples=0;
   for(let slot=0;slot<100;slot++) {
-    let previous=0, rises=0;
-    for(let step=0;step<1650;step++) {
+    let previous=0, rises=0, first=-1, last=-1;
+    for(let step=0;step<steps;step++) {
       const [x,y,z,value]=stormFlash(slot*FLASH_INTERVAL_SECONDS+step/1000);
-      assert.ok(value>=0&&value<=1); assert.ok(Math.abs(value-previous)<.007);
+      assert.ok(value>=0&&value<=1); assert.ok(Math.abs(value-previous)<.01);
       if(previous<=.5&&value>.5) rises++;
-      if(value>0) { assert.ok(stormRegion([x,y,z])>.99); assert.ok(Math.abs(Math.hypot(x,y,z)-1)<1e-10); }
-      if(step>1200) assert.equal(value,0,'Every event ends before a new position can light.');
+      if(value>0) {
+        activeSamples++; if(first<0) first=step; last=step;
+        assert.ok(stormRegion([x,y,z])>.99); assert.ok(Math.abs(Math.hypot(x,y,z)-1)<1e-10);
+      }
+      if(step>=steps-15) assert.equal(value,0,'Every event ends before a new position can light.');
       previous=value;
     }
     assert.equal(rises,1);
+    assert.ok(first>0&&last<steps-15);
+    onsets.add(first); durations.add(last-first);
     positions.add(stormFlash(slot*FLASH_INTERVAL_SECONDS+.6).slice(0,3).join(','));
   }
   assert.equal(positions.size,100);
+  assert.ok(onsets.size>25&&durations.size>15,'Both onset and duration must vary.');
+  const activeFraction=activeSamples/(100*steps);
+  assert.ok(activeFraction>.85&&activeFraction<.90,'A patch glows for most of the cycle, with a brief dark interval.');
 });
 
 test('orbital lightning is diffuse cloud illumination, with no drawn bolts or global flash envelope', async () => {
