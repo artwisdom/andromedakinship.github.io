@@ -4,8 +4,23 @@ export const PLANET_CENTER = Object.freeze([.28,1.32,.16]);
 // A thousandfold smaller world; the local render frame preserves surface precision.
 export const PLANET_RADIUS = .000075;
 export const STORM_REGION = Object.freeze([-.78,-.32,.54]);
-export const FLASH_INTERVAL_SECONDS = .82;
+export const FLASH_INTERVAL_SECONDS = .5;
 export const STORM_TEXTURE_URL = '/assets/storm-clouds-v2.jpg';
+// Planet-fixed districts, not screen overlays. Sizes are fractions of radius.
+export const CITY_DISTRICTS = Object.freeze([
+  Object.freeze({ center:Object.freeze([-.10,-.96,.26]), size:.145, seed:7 }),
+  Object.freeze({ center:Object.freeze([.26,-.83,.49]), size:.105, seed:23 }),
+  Object.freeze({ center:Object.freeze([-.28,-.94,-.18]), size:.092, seed:41 })
+]);
+export const CITY_TOWER_TOPS = Object.freeze([.026,.024,.023]);
+export const CITY_LIGHT_PALETTE = Object.freeze([
+  Object.freeze([1,.80,.57]), Object.freeze([.68,.82,1]),
+  Object.freeze([.44,.72,.87]), Object.freeze([.74,.62,.82])
+]);
+// Only a small crown is suggested above the cloud deck, not readable buildings.
+export const CITY_SKYLINE = Object.freeze([
+  Object.freeze({ offset:Object.freeze([0,0]), height:1, width:.0022 })
+]);
 const quadVertex = `
 attribute vec2 aPosition;
 varying vec2 vUv;
@@ -127,7 +142,7 @@ ${cameraUniforms}
 uniform vec3 uSystemCamera;
 uniform vec4 uFlash;
 uniform sampler2D uCloudMap;
-uniform float uCloudBlend;
+uniform float uCloudBlend, uPixelSpan;
 const vec3 planet = vec3(${PLANET_CENTER.join(',')});
 const float radius = .075;
 const vec3 weatherCenter = normalize(vec3(${STORM_REGION.join(',')}));
@@ -174,6 +189,91 @@ float sphereHit(vec3 origin, vec3 ray, vec3 center, float size) {
   float nearHit = -b-sqrt(h); return nearHit > .00001 ? nearHit : -1.;
 }
 vec4 over(vec4 front, vec4 back) { return front + back * (1.-front.a); }
+// A common rotating reference frame keeps streets, towers, and weather attached
+// to the sphere while the camera moves around them.
+vec3 planetFrame(vec3 value) {
+  vec3 axis=normalize(vec3(-.10,.18,.98)), tangent=normalize(cross(vec3(0,1,0),axis));
+  vec3 p=vec3(dot(value,tangent),dot(value,cross(axis,tangent)),dot(value,axis));
+  float spin=sin(uTime*.012)*.12;
+  p.xy=mat2(cos(spin),-sin(spin),sin(spin),cos(spin))*p.xy;
+  return p;
+}
+vec3 cityTint(float value) {
+  vec3 tint=vec3(${CITY_LIGHT_PALETTE[0].join(',')});
+  tint=mix(tint,vec3(${CITY_LIGHT_PALETTE[1].join(',')}),smoothstep(.34,.56,value));
+  tint=mix(tint,vec3(${CITY_LIGHT_PALETTE[2].join(',')}),smoothstep(.65,.83,value));
+  return mix(tint,vec3(${CITY_LIGHT_PALETTE[3].join(',')}),smoothstep(.90,.99,value));
+}
+// Jitter positions, brightness, and color; unresolved lights blend to a mean.
+vec3 cityWindows(vec2 q, float seed, float pixel) {
+  vec2 cell=floor(q), shift=vec2(hash3(vec3(cell,seed)),hash3(vec3(cell,seed+13.)));
+  vec2 d=fract(q)-(.14+.72*shift);
+  float h=hash3(vec3(cell,seed+29.));
+  float light=(exp(-dot(d,d)*(42.+h*60.))+.055*exp(-dot(d,d)*12.))*(.28+h*.65);
+  vec3 color=cityTint(hash3(vec3(cell,seed+53.)))*light;
+  vec3 neighborhood=cityTint(fract(noise3(vec3(q*.09,seed+91.))*1.9+seed*.07));
+  return mix(color,neighborhood*.031,smoothstep(.12,.85,pixel));
+}
+// Irregular settlement glow with dark gaps, not legible streets from orbit.
+vec4 cityDistrict(vec3 p, vec3 center, float size, float seed, float pixel) {
+  center=normalize(center);
+  if(dot(p,center)<1.-size*size*1.2) return vec4(0.);
+  vec3 east=normalize(cross(vec3(0,0,1),center)), north=cross(center,east);
+  vec2 uv=vec2(dot(p-center,east),dot(p-center,north))/size;
+  uv=mat2(cos(seed),-sin(seed),sin(seed),cos(seed))*uv;
+  vec2 q=uv+(vec2(noise3(vec3(uv*2.7,seed)),noise3(vec3(uv*2.7,seed+8.)))-.5)*.48;
+  vec2 a=q*vec2(1.1,1.6), b=(q+vec2(.48,.28))*vec2(.8,1.7), c=(q-vec2(.45,.27))*vec2(1.5,.7);
+  float downtown=exp(-dot(uv,uv)*24.);
+  float growth=exp(-dot(a,a)*4.)+exp(-dot(b,b)*10.)*.9+exp(-dot(c,c)*12.)*.85+downtown*.4;
+  float districts=noise3(vec3(q*5.,seed+17.));
+  float city=smoothstep(.13,.52,growth+(districts-.5)*.65)*(1.-smoothstep(.9,1.24,length(uv)));
+  float cut=max(abs(q.x+.22*sin(q.y*5.3+seed)-.3),downtown*.12);
+  city*=smoothstep(.025,.085,cut);
+  float core=min(1.,growth), footprint=pixel/size;
+  vec3 windows=cityWindows(q*82.,seed,footprint*98.)+cityWindows(q*38.+7.3,seed+37.,footprint*46.)*.65;
+  vec3 emission=windows*(.7+core*.8)*(.45+districts*.8);
+  return vec4(emission,(.15+core*.4)*(.5+districts))*city;
+}
+// Ray/box intersection in a tower's local radial frame: real sides and crowns,
+// rather than an upright billboard. Missing intersections have negative depth.
+vec4 towerBox(vec3 ro, vec3 rd, vec3 halfSize) {
+  vec3 safeRay=mix(vec3(-1.),vec3(1.),step(vec3(0.),rd))*max(abs(rd),vec3(.00001));
+  vec3 a=(-halfSize-ro)/safeRay, b=(halfSize-ro)/safeRay;
+  vec3 near=min(a,b), far=max(a,b);
+  float entry=max(near.x,max(near.y,near.z)), leave=min(far.x,min(far.y,far.z));
+  if(leave<max(0.,entry)) return vec4(0.,0.,0.,-1.);
+  vec3 normal=-sign(safeRay)*step(near.yzx,near.xyz)*step(near.zxy,near.xyz);
+  return vec4(normal,entry);
+}
+vec4 citySpire(vec3 origin, vec3 ray, vec3 center, float top, float width, float style, inout float ground, float cover, float pixel) {
+  center=normalize(center);
+  vec3 east=normalize(cross(vec3(0,0,1),center)), north=cross(center,east);
+  vec3 delta=origin-center;
+  vec3 ro=vec3(dot(delta,east),dot(delta,north),dot(delta,center));
+  vec3 rd=vec3(dot(ray,east),dot(ray,north),dot(ray,center));
+  float angle=style*1.7;
+  mat2 turn=mat2(cos(angle),-sin(angle),sin(angle),cos(angle));
+  ro.xy=turn*ro.xy; rd.xy=turn*rd.xy;
+  vec4 hit=vec4(0.,0.,0.,-1.);
+  for(int tier=0;tier<2;tier++) {
+    float level=float(tier), bottom=.012+top*level*.16, roof=top*(.8+level*.2);
+    vec3 halfSize=vec3(width*(1.-level*.55),width*.68*(1.-level*.52),(roof-bottom)*.5);
+    vec3 setback=vec3(width*level*.14*sin(style),width*level*.13*cos(style),(bottom+roof)*.5);
+    vec4 part=towerBox(ro-setback,rd,halfSize);
+    if(part.w>0.&&part.w<ground&&(hit.w<0.||part.w<hit.w)) hit=part;
+  }
+  if(hit.w<0.) return vec4(0.);
+  ground=hit.w;
+  vec3 point=ro+rd*hit.w;
+  float edge=pow(1.-abs(dot(hit.xyz,-rd)),3.);
+  float crown=smoothstep(top-.003,top,point.z);
+  vec3 steel=vec3(.012,.024,.042)*(1.+max(0.,dot(hit.xyz,normalize(vec3(-1,-.4,1)))));
+  vec3 tint=cityTint(fract(style*.137));
+  vec3 light=tint*crown*.045;
+  float aboveCloud=smoothstep(.0175,.024,point.z);
+  float opacity=mix(1.,aboveCloud,cover)*(1.-smoothstep(width*.7,width*1.8,pixel));
+  return vec4((steel*.7+light+tint*edge*.018)*opacity,opacity);
+}
 void main() {
   vec2 uv = (vUv*2.-1.-uOffset) * vec2(uAspect,1.) / 1.85;
   vec3 ray = normalize(uForward + uv.x*uRight + uv.y*uUp);
@@ -228,16 +328,12 @@ void main() {
   if (planetHit < 0. || ringHit > planetHit) result = over(ringColor,result);
   if (planetHit > 0.) {
     vec3 point = origin+ray*planetHit, normal = normalize(point-planet);
-    vec3 tangent = normalize(cross(vec3(0,1,0),axis));
-    vec3 p = vec3(dot(normal,tangent),dot(normal,cross(axis,tangent)),dot(normal,axis));
-    float spin = sin(uTime*.012)*.12;
-    p.xy = mat2(cos(spin),-sin(spin),sin(spin),cos(spin))*p.xy;
+    vec3 p=planetFrame(normal);
     // A raised cloud deck and a second drifting veil sit above the dark crust.
     // Sample their own sphere intersection, not the ground's flat coordinates.
     float cloudHit=sphereHit(origin,ray,planet,radius*1.018);
     vec3 cloudNormal=normalize(origin+ray*cloudHit-planet);
-    vec3 cp=vec3(dot(cloudNormal,tangent),dot(cloudNormal,cross(axis,tangent)),dot(cloudNormal,axis));
-    cp.xy=mat2(cos(spin),-sin(spin),sin(spin),cos(spin))*cp.xy;
+    vec3 cp=planetFrame(cloudNormal);
     vec3 wind=vec3(sin(uTime*.004),cos(uTime*.003)-1.,sin(uTime*.002))*.035;
     vec3 q=vortex(cp,normalize(vec3(-.50,-.75,.44)),.24)+wind;
     float broad=textureField(q*4.);
@@ -262,6 +358,25 @@ void main() {
     // One independently placed event at a time; the cloud texture breaks up its
     // diffuse glow. Calm regions and the planet-wide exposure never flash.
     color += vec3(.50,.65,1.1)*cloudLight(cp)*max(cover,.35*region)*(.6+billows*.6);
+    float pixel=planetHit/radius*uPixelSpan/max(.18,dot(normal,-ray));
+    vec4 cities=vec4(0.);
+    ${CITY_DISTRICTS.map(({center,size,seed})=>`cities+=cityDistrict(p,vec3(${center.join(',')}),${size},${seed}.,pixel);`).join('\n    ')}
+    float night=1.-smoothstep(.55,.95,day);
+    float transmission=exp(-cover*4.0);
+    vec3 cityLights=cities.rgb*4.8*transmission;
+    // Only a faint glow leaks through thicker cloud; no sharp roads or facades.
+    cityLights+=vec3(.60,.48,.33)*cities.a*(.012+cover*.035);
+    color+=cityLights/(1.+cityLights*3.5)*night;
+    vec3 cityOrigin=planetFrame((origin-planet)/radius), cityRay=planetFrame(ray);
+    float towerDepth=planetHit/radius;
+    ${CITY_DISTRICTS.map(({center,seed},i)=>`if(length(p-normalize(vec3(${center.join(',')})))<.055) {
+      vec3 center=normalize(vec3(${center.join(',')})), east=normalize(cross(vec3(0,0,1),center)), north=cross(center,east);
+      ${CITY_SKYLINE.map(({offset,height,width},j)=>`{
+        vec3 base=normalize(center+east*${offset[0].toFixed(3)}+north*${offset[1].toFixed(3)});
+        vec4 tower=citySpire(cityOrigin,cityRay,base,${(CITY_TOWER_TOPS[i]*height).toFixed(5)},${width},${(seed+j*1.73).toFixed(2)},towerDepth,cover,pixel);
+        color=tower.rgb+color*(1.-tower.a);
+      }`).join('\n      ')}
+    }`).join('\n    ')}
     color = pow(max(vec3(0.),color),vec3(.88));
     color = min(color,vec3(.88,.93,1.));
     result = over(vec4(color,1.),result);
@@ -287,13 +402,14 @@ export function stormRegion(point) {
 // pause, not a common envelope that illuminates every storm simultaneously.
 export function stormFlash(seconds) {
   const time=Number.isFinite(seconds)?Math.max(0,seconds):0;
-  const slot=Math.floor(time/FLASH_INTERVAL_SECONDS), phase=time-slot*FLASH_INTERVAL_SECONDS;
+  const slot=Math.floor(time/FLASH_INTERVAL_SECONDS), phase=(time-slot*FLASH_INTERVAL_SECONDS)/FLASH_INTERVAL_SECONDS;
   const random=n=>{const v=Math.sin(n*127.1+311.7)*43758.5453; return v-Math.floor(v);};
   const center=normalize(STORM_REGION), right=normalize(cross(center,[0,0,1])), up=cross(right,center);
   const z=mix(.42,.96,random(slot+1)), angle=random(slot+19)*Math.PI*2, r=Math.sqrt(1-z*z);
   const point=center.map((v,i)=>v*z+r*(right[i]*Math.cos(angle)+up[i]*Math.sin(angle)));
-  const age=phase-(.015+random(slot+47)*.06), duration=.70+random(slot+109)*.025;
-  const energy=ease(age/.16)*(1-ease((age-.20)/(duration-.20)))*(.68+random(slot+83)*.32);
+  // The envelope scales with its slot, retaining soft fades and a dark gap.
+  const age=phase-(.02+random(slot+47)*.07), duration=.855+random(slot+109)*.03;
+  const energy=ease(age/.195)*(1-ease((age-.244)/(duration-.244)))*(.68+random(slot+83)*.32);
   return [...point,energy];
 }
 
@@ -353,7 +469,7 @@ export function createGalaxy(canvas, { reducedMotion = false, paused = false } =
     programs.push(program);
     gl.attachShader(program, compile(gl.VERTEX_SHADER, vertex)); gl.attachShader(program, compile(gl.FRAGMENT_SHADER, fragment)); gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error('Galaxy unavailable');
-    const keys = ['uCamera', 'uRight', 'uUp', 'uForward', 'uOffset', 'uAspect', 'uTime', 'uProgress', 'uDpr', 'uMobile', 'uTravel', 'uArrival', 'uReveal', 'uSystemCamera', 'uFlash', 'uCloudMap', 'uCloudBlend'];
+    const keys = ['uCamera', 'uRight', 'uUp', 'uForward', 'uOffset', 'uAspect', 'uTime', 'uProgress', 'uDpr', 'uMobile', 'uTravel', 'uArrival', 'uReveal', 'uSystemCamera', 'uFlash', 'uCloudMap', 'uCloudBlend', 'uPixelSpan'];
     return { program, uniforms: Object.fromEntries(keys.map(key => [key, gl.getUniformLocation(program, key)])) };
   }
   let dust, stars, system, quadBuffer, starBuffer;
@@ -442,6 +558,7 @@ export function createGalaxy(canvas, { reducedMotion = false, paused = false } =
       gl.uniform4fv(renderer.uniforms.uFlash,stormFlash(time));
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,cloudTexture);
       gl.uniform1i(renderer.uniforms.uCloudMap,0); gl.uniform1f(renderer.uniforms.uCloudBlend,cloudBlend);
+      gl.uniform1f(renderer.uniforms.uPixelSpan,2/(1.85*canvas.height));
     }
   }
   function draw() {

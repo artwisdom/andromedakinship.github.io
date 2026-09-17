@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { createGalaxy, galaxyView, galaxyProgress, systemArrival, systemReveal, stormRegion, stormFlash, FLASH_INTERVAL_SECONDS, PLANET_CENTER, PLANET_RADIUS, STORM_TEXTURE_URL } from '../assets/galaxy.js';
+import { createGalaxy, galaxyView, galaxyProgress, systemArrival, systemReveal, stormRegion, stormFlash, FLASH_INTERVAL_SECONDS, PLANET_CENTER, PLANET_RADIUS, STORM_TEXTURE_URL, CITY_DISTRICTS, CITY_TOWER_TOPS, CITY_LIGHT_PALETTE, CITY_SKYLINE } from '../assets/galaxy.js';
 
 function environment({ shaderOK = true } = {}) {
   const descriptors = new Map();
@@ -121,32 +121,111 @@ test('the weather region covers about two fifths of the sphere, leaving calmer s
   assert.ok(coverage/10000>.38&&coverage/10000<.41);
 });
 
+test('three separated settlements stay in the storm region with barely exposed crowns', () => {
+  assert.equal(CITY_DISTRICTS.length,3); assert.equal(CITY_TOWER_TOPS.length,3);
+  assert.ok(Object.isFrozen(CITY_DISTRICTS)&&Object.isFrozen(CITY_TOWER_TOPS));
+  let footprint=0;
+  for(const [i,city] of CITY_DISTRICTS.entries()) {
+    assert.ok(Object.isFrozen(city)&&Object.isFrozen(city.center));
+    assert.ok(city.center.every(Number.isFinite)); assert.ok(stormRegion(city.center)>.99);
+    assert.ok(city.size>.05&&city.size<.16); footprint+=city.size**2/4;
+    for(const other of CITY_DISTRICTS.slice(i+1)) {
+      const normalized=c=>c.center.map(v=>v/Math.hypot(...c.center));
+      assert.ok(Math.hypot(...normalized(city).map((v,k)=>v-normalized(other)[k]))>city.size+other.size);
+    }
+  }
+  assert.ok(footprint<.015,'Cities occupy a small part of the world, not a planet-wide grid.');
+  for(const height of CITY_TOWER_TOPS) assert.ok(height>.018&&height<=.026);
+});
+
+test('only one restrained crown per settlement remains with muted light colors', () => {
+  assert.equal(CITY_SKYLINE.length,1); assert.ok(Object.isFrozen(CITY_SKYLINE));
+  assert.deepEqual(CITY_SKYLINE[0].offset,[0,0]); assert.equal(CITY_SKYLINE[0].height,1);
+  for(const tower of CITY_SKYLINE) {
+    assert.ok(Object.isFrozen(tower)&&Object.isFrozen(tower.offset));
+    assert.ok(tower.height>0&&tower.height<=1); assert.ok(tower.width>.001&&tower.width<.003);
+    assert.deepEqual(tower.offset,[0,0],'The tiny crown stays in the settlement center.');
+  }
+  assert.equal(CITY_DISTRICTS.length*CITY_SKYLINE.length,3,'The miniature skyline clusters are removed.');
+  assert.equal(CITY_LIGHT_PALETTE.length,4); assert.ok(Object.isFrozen(CITY_LIGHT_PALETTE));
+  for(const color of CITY_LIGHT_PALETTE) {
+    assert.ok(Object.isFrozen(color)); assert.equal(color.length,3);
+    assert.ok(color.every(n=>Number.isFinite(n)&&n>=0&&n<=1));
+    assert.ok(Math.max(...color)-Math.min(...color)<.5,'City colors remain muted rather than neon.');
+  }
+  assert.equal(new Set(CITY_LIGHT_PALETTE.map(c=>c.join(','))).size,4);
+});
+
+test('cities use filtered surface detail, cloud transmission, and depth-tested radial towers', async () => {
+  const source=await readFile(new URL('../assets/galaxy.js',import.meta.url),'utf8');
+  assert.match(source,/vec3 p=planetFrame\(normal\)/);
+  assert.match(source,/vec3 cp=planetFrame\(cloudNormal\)/);
+  assert.match(source,/float transmission=exp\(-cover\*4\.0\)/);
+  assert.match(source,/mix\(color,neighborhood\*\.031,smoothstep\(\.12,\.85,pixel\)\)/);
+  assert.doesNotMatch(source,/float floors|floors=mix|float ribs|occupied=mix/,'Visible facade detail must not return.');
+  assert.match(source,/cityLights\/\(1\.\+cityLights\*3\.5\)/,'Soft highlight rolloff prevents sharp luminous cutouts.');
+  assert.match(source,/part\.w>0\.&&part\.w<ground/);
+  assert.match(source,/smoothstep\(\.0175,\.024,point\.z\)/);
+  assert.match(source,/for\(int tier=0;tier<2;tier\+\+\)/);
+  assert.match(source,/inout float ground/);
+  assert.match(source,/ground=hit\.w/,'The crown must respect the shared depth limit.');
+  const env=environment();
+  try {
+    const galaxy=createGalaxy(env.canvas); galaxy.update(2200,3200);
+    for(let i=1;i<=200;i++) env.step(i*40);
+    const draws=env.draws(); env.step(8040); assert.equal(env.draws()-draws,3);
+    assert.equal(env.uniforms.get('uPixelSpan'),2/(1.85*env.canvas.height));
+    galaxy.destroy();
+  } finally { env.restore(); }
+});
+
+test('city growth uses warped neighborhoods and offset lights without a repeated street grid', async () => {
+  const source=await readFile(new URL('../assets/galaxy.js',import.meta.url),'utf8');
+  const city=source.slice(source.indexOf('vec3 cityWindows('),source.indexOf('// Ray/box intersection'));
+  assert.match(city,/shift=vec2\(hash3/,'Individual light positions must not sit at regular cell centers.');
+  assert.match(city,/vec2 q=uv\+\(vec2\(noise3/,'Street and light coordinates follow the same nonlinear warp.');
+  assert.match(city,/growth=exp\(-dot\(a,a\)/,'The footprint has several asymmetric growth centers.');
+  assert.match(city,/city\*=smoothstep\(\.025,\.085,cut\)/,'Dark undeveloped gaps interrupt the urban footprint.');
+  assert.doesNotMatch(city,/float route|float feeders|float streets/,'Road-level linework is not drawn at orbital distance.');
+  assert.match(city,/downtown=exp\(-dot\(uv,uv\)\*24\.\)/,'The brightest core is centered on the main tower base.');
+  assert.equal((city.match(/cityWindows\(q\*/g)||[]).length,2,'Two softened light fields suggest settlement density.');
+  assert.match(city,/cityTint\(hash3/,'Individual lights use the multi-color palette.');
+  assert.doesNotMatch(city,/avenues=abs\(fract|blocks=uv\*|inCell=fract|hubPoint=fract/);
+  assert.doesNotMatch(city,/uTime/,'City lights must stay steady instead of flickering randomly each frame.');
+});
+
+test('lightning frequency is 50–75 percent higher than the previous 0.82-second schedule', () => {
+  const increase=.82/FLASH_INTERVAL_SECONDS-1;
+  assert.ok(increase>=.5&&increase<=.75);
+  assert.equal(FLASH_INTERVAL_SECONDS,.5);
+});
+
 test('near-continuous cloud glows vary timing and position while retaining short dark gaps', () => {
-  assert.equal(FLASH_INTERVAL_SECONDS,.82);
   for(const value of [NaN,Infinity,-Infinity,-5,0]) assert.equal(stormFlash(value)[3],0);
   const positions=new Set(), onsets=new Set(), durations=new Set();
   const steps=Math.round(FLASH_INTERVAL_SECONDS*1000);
+  const darkTailSteps=Math.floor(steps*.02), maxStepChange=1.5/(steps*.195)+.0001;
   let activeSamples=0;
   for(let slot=0;slot<100;slot++) {
     let previous=0, rises=0, first=-1, last=-1;
     for(let step=0;step<steps;step++) {
       const [x,y,z,value]=stormFlash(slot*FLASH_INTERVAL_SECONDS+step/1000);
-      assert.ok(value>=0&&value<=1); assert.ok(Math.abs(value-previous)<.01);
+      assert.ok(value>=0&&value<=1); assert.ok(Math.abs(value-previous)<maxStepChange);
       if(previous<=.5&&value>.5) rises++;
       if(value>0) {
         activeSamples++; if(first<0) first=step; last=step;
         assert.ok(stormRegion([x,y,z])>.99); assert.ok(Math.abs(Math.hypot(x,y,z)-1)<1e-10);
       }
-      if(step>=steps-15) assert.equal(value,0,'Every event ends before a new position can light.');
+      if(step>=steps-darkTailSteps) assert.equal(value,0,'Every event ends before a new position can light.');
       previous=value;
     }
     assert.equal(rises,1);
-    assert.ok(first>0&&last<steps-15);
+    assert.ok(first>0&&last<steps-darkTailSteps);
     onsets.add(first); durations.add(last-first);
-    positions.add(stormFlash(slot*FLASH_INTERVAL_SECONDS+.6).slice(0,3).join(','));
+    positions.add(stormFlash((slot+.6)*FLASH_INTERVAL_SECONDS).slice(0,3).join(','));
   }
   assert.equal(positions.size,100);
-  assert.ok(onsets.size>25&&durations.size>15,'Both onset and duration must vary.');
+  assert.ok(onsets.size>steps*.05&&durations.size>steps*.02,'Both onset and duration must vary.');
   const activeFraction=activeSamples/(100*steps);
   assert.ok(activeFraction>.85&&activeFraction<.90,'A patch glows for most of the cycle, with a brief dark interval.');
 });

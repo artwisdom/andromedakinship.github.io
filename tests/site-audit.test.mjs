@@ -90,7 +90,9 @@ test('rendering budgets remain bounded and no remote 3D library or tracker is ad
   assert.match(galaxy,/Math.sqrt\(1600000 \/ \(width \* height\)\)/);
   assert.match(galaxy,/now - lastDraw >= 31/);
   assert.doesNotMatch(galaxy,/https?:|addEventListener\(['"]wheel/);
-  const bundle=await read('assets/site.bundle.js'); assert.ok(Buffer.byteLength(bundle)<95000);
+  // Allow softened settlements and three tiny two-tier crowns;
+  // frame rate, pixel fill, draw count, and external dependencies stay unchanged.
+  const bundle=await read('assets/site.bundle.js'); assert.ok(Buffer.byteLength(bundle)<101000);
 });
 
 test('cloud artwork is a bounded local image included in release cache invalidation', async () => {
